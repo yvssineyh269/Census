@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String    @id
+  name            String
+  email           String    @unique
+  emailVerified   Boolean   @default(false)
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  username        String?   @unique
+  displayUsername String?
+  role            String    @default("saleperson")
+  accounts        Account[]
+  cancelleedSales Sale[]    @relation("SaleCancelledBy")
+  createdSales    Sale[]    @relation("SaleSaleperson")
+  validatedSales  Sale[]    @relation("SaleValidatedBy")
+  sessions        Session[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  image         String
+  purchasePrice Float
+  sellingPrice  Float
+  commission    Float
+  quantity      Int       @default(0)
+  stockAlert    Int       @default(5)
+  description   String?
+  producedAt    DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  sales         Sale[]
+
+  @@index([deletedAt])
+  @@map("products")
+}
+
+model Sale {
+  id            String    @id @default(cuid())
+  status        SaleState @default(pending)
+  sellingPrice  Float
+  commission    Float
+  quantity      Int       @default(1)
+  note          String?
+  soldAt        DateTime  @default(now())
+  validatedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  salepersonId  String
+  validatorId   String?
+  cancelledById String?
+  productId     String
+  cancelledBy   User?     @relation("SaleCancelledBy", fields: [cancelledById], references: [id])
+  product       Product   @relation(fields: [productId], references: [id])
+  saleperson    User      @relation("SaleSaleperson", fields: [salepersonId], references: [id])
+  validatedBy   User?     @relation("SaleValidatedBy", fields: [validatorId], references: [id])
+
+  @@index([salepersonId])
+  @@index([validatorId])
+  @@index([cancelledById])
+  @@index([productId])
+  @@index([status])
+  @@map("sales")
+}
+
+enum Role {
+  admin
+  manager
+  saleperson
+  assistant
+  accountant
+}
+
+enum SaleState {
+  pending
+  validated
+  cancelled
+}
