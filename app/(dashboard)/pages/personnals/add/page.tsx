@@ -14,7 +14,7 @@ export default function AddNewUserPage() {
         </p>
       </div>
       {/* Cartes des produits */}
-      {users.length === 0 ? (
+      {/* {users.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-40 gap-2 text-muted-foreground">
           <p className="text-xl font-medium">Pas de prduit sur la plateforme pour l'instant</p>
         </div>
@@ -24,7 +24,7 @@ export default function AddNewUserPage() {
             <PersonnalCard key={item.id} products={item} />
           ))}
         </div>
-      )}
+      )} */}
     </div>
   )
 }
