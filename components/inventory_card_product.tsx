@@ -15,7 +15,7 @@ import image from "@/public/bg.png";
 import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { ProductForAdmin } from "@/lib/types";
+import { GetAllProductsType } from "@/lib/types";
 
 const actionButtonClass = {
   variant: "outline" as const,
@@ -23,7 +23,7 @@ const actionButtonClass = {
 };
 
 interface ProductProps {
-  products: ProductForAdmin;
+  products: GetAllProductsType;
 }
 
 const badgeClassName =

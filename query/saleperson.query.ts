@@ -51,7 +51,7 @@ export async function getSalepersonMetrics(userId: string) {
   const [
     totalCommission,
     totalSalesPending,
-    totaSalesSolded,
+    totalSalesSold,
     lastWeekCommission,
   ] = await Promise.all([
     // Commission de la semain courant
@@ -106,7 +106,7 @@ export async function getSalepersonMetrics(userId: string) {
             10,
         ) / 10;
   return {
-    totaSalesSolded,
+    totalSalesSold,
     totalCommission: currentCommission,
     totalSalesPending,
     growthRate,

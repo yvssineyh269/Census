@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { BellDot, CirclePlusIcon, FilePlusIcon, LucideIcon, PackagePlusIcon, Plus, UserPlusIcon } from "lucide-react"
+import { BellDot, FilePlusIcon, LucideIcon, PackagePlusIcon, Plus, UserPlusIcon } from "lucide-react"
 import Link from "next/link"
 import {
   DropdownMenu,

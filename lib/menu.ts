@@ -1,81 +1,106 @@
-import { Banknote, BanknoteArrowDown, ChartBarIcon, CircleHelpIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, FolderIcon, HistoryIcon, LayoutDashboardIcon, ListIcon, Outdent, SearchIcon, Settings, Settings2Icon, UsersIcon } from "lucide-react";
+import {
+  BanknoteArrowDown,
+  ChartBarIcon,
+  CircleHelpIcon,
+  FileChartColumnIcon,
+  FileIcon,
+  HistoryIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  Settings,
+  UsersIcon,
+} from "lucide-react";
+import type { Role } from "./roles";
+
+export type MenuItem = {
+  title: string;
+  url: string;
+  icon: typeof LayoutDashboardIcon;
+  visibleBy: Role[];
+};
 
 export const menu = {
-
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-
   navMain: [
     {
       title: "Tableau de bord",
       url: "/",
-      icon: LayoutDashboardIcon
+      icon: LayoutDashboardIcon,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Inventaire",
       url: "/inventory",
-      icon: ListIcon
+      icon: ListIcon,
+      visibleBy: ["admin", "assistant", "manager"] as Role[],
     },
     {
       title: "Analyse",
       url: "#",
-      icon: ChartBarIcon
-       
+      icon: ChartBarIcon,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Historique",
       url: "/historic",
-      icon: HistoryIcon
-       
+      icon: HistoryIcon,
+      visibleBy: ["admin", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Personnels",
       url: "/personals",
-      icon: UsersIcon
-        
+      icon: UsersIcon,
+      visibleBy: ["admin", "manager", "accountant"] as Role[],
     },
   ],
-
 
   navSecondary: [
     {
       title: "Paramètres",
       url: "/settings",
-      icon: Settings
-        
+      icon: Settings,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Help",
       url: "/help",
-      icon: CircleHelpIcon
-        
+      icon: CircleHelpIcon,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
   ],
 
-
   documents: [
-  
     {
       title: "Rapports",
       url: "/repports",
-      icon: FileChartColumnIcon
-        
+      icon: FileChartColumnIcon,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Assistance",
       url: "/assistance",
-      icon: FileIcon
-        
+      icon: FileIcon,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
-
     {
-        title: "Crédit et dépenses",
-        url: "/assistance",
-        icon: BanknoteArrowDown
-          
-      },
+      title: "Crédit et dépenses",
+      url: "/assistance",
+      icon: BanknoteArrowDown,
+      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
+    },
   ],
+} satisfies {
+  navMain: MenuItem[];
+  navSecondary: MenuItem[];
+  documents: MenuItem[];
+};
+
+export function filterMenuByRole<T extends { visibleBy: Role[] }>(
+  items: T[],
+  role: Role | null,
+): T[] {
+  if (!role) {
+    return [];
+  }
+
+  return items.filter((item) => item.visibleBy.includes(role));
 }

@@ -15,13 +15,22 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import logo from "@/public/next-step-logo.jpeg"
-import { menu } from "@/lib/menu"
+import { menu, filterMenuByRole } from "@/lib/menu"
+import { authClient } from "@/lib/auth-client"
+import { isRole } from "@/lib/roles"
 import Image from "next/image"
 import Link from "next/link"
 
 
 export function AppSidebar() {
+  const { data: session } = authClient.useSession()
   const { isMobile, setOpenMobile } = useSidebar()
+
+  const currentRole = isRole(session?.user.role) ? session.user.role : null
+
+  const visibleNavMain = filterMenuByRole(menu.navMain, currentRole)
+  const visibleNavDocuments = filterMenuByRole(menu.documents, currentRole)
+  const visibleNavSecondary = filterMenuByRole(menu.navSecondary, currentRole)
 
   const closeMobileSidebar = () => {
     if (isMobile) {
@@ -50,9 +59,9 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={menu.navMain} />
-        <NavDocuments items={menu.documents} />
-        <NavSecondary items={menu.navSecondary} className="mt-auto" />
+        <NavMain items={visibleNavMain} />
+        <NavDocuments items={visibleNavDocuments} />
+        <NavSecondary items={visibleNavSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
