@@ -2,11 +2,14 @@
 import AdminCards from "@/components/card/admin-card"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { getCurrentSession } from "@/server/current-session";
+import SalesReviewTable from "@/components/table/sales-review-table";
+import { getSalesHistoric } from "@/query/historic.query";
 
 
 export default async function AdminPage() {
   
   const session = await getCurrentSession();
+  const sales = await getSalesHistoric();
   
   return (
     <div className="flex flex-1 flex-col">
@@ -17,7 +20,7 @@ export default async function AdminPage() {
             <ChartAreaInteractive />
             <ChartAreaInteractive />
           </div>
-          {/* <AdminDataTable /> */}
+          <SalesReviewTable sales={sales} role="admin" />
         </div>
       </div>
     </div>

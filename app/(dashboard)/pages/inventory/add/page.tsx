@@ -1,4 +1,4 @@
-import AddUserForm from '@/components/add-user-form'
+import AddProductForm from '@/components/add-product-form'
 
 export default function AddProductPage() {
   return (
@@ -10,7 +10,7 @@ export default function AddProductPage() {
             </p>
           </div>
           {/* Cartes des produits */}
-          <AddUserForm />
+          <AddProductForm />
     </div>
   )
 }

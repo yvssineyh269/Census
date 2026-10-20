@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,7 +9,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { BellDot, FilePlusIcon, LucideIcon, PackagePlusIcon, Plus, UserPlusIcon } from "lucide-react"
+import { LucideIcon, Plus } from "lucide-react"
+import type { StockAlertDto } from "@/lib/types"
+import { StockAlertViewer } from "./stock-alert-viewer"
 import Link from "next/link"
 import {
   DropdownMenu,
@@ -21,12 +22,21 @@ import {
 
 export function NavMain({
   items,
+  quickAdd,
+  stockAlerts,
 }: {
   items: {
     title: string
     url: string
     icon?: LucideIcon
   }[]
+  quickAdd: {
+    title: string
+    url: string
+    icon: LucideIcon
+  }[]
+  // null : le rôle connecté ne reçoit pas les alertes de stock
+  stockAlerts: StockAlertDto[] | null
 }) {
   const { isMobile, setOpenMobile } = useSidebar()
 
@@ -52,28 +62,17 @@ export function NavMain({
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="right" align="start" className="w-56">
-                <DropdownMenuItem>
-                  <FilePlusIcon />
-                  <span>Nouvelle clause</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <PackagePlusIcon />
-                  <span>Nouveau produit</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <UserPlusIcon />
-                  <span>Nouvel utilisateur</span>
-                </DropdownMenuItem>
+                {quickAdd.map((item) => (
+                  <DropdownMenuItem key={item.title} asChild>
+                    <Link href={item.url} onClick={closeMobileSidebar}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <BellDot />
-              <span className="sr-only">Inbox</span>
-            </Button>
+            {stockAlerts && <StockAlertViewer alerts={stockAlerts} />}
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarGroupLabel className="mt-2">Menu Principal</SidebarGroupLabel>

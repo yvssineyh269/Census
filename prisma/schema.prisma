@@ -76,7 +76,7 @@ model Verification {
 
 model Product {
   id            String    @id @default(cuid())
-  name          String
+  productName          String
   image         String
   purchasePrice Float
   sellingPrice  Float

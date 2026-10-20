@@ -22,9 +22,20 @@ const baseUrl = process.env.VERCEL_URL
 interface VerifyEmailProps {
   username: string;
   verifyUrl: string;
+  preview?: string;
+  title?: string;
+  message?: string;
+  buttonLabel?: string;
 }
 
-export const VerifyEmail = ({ username, verifyUrl }: VerifyEmailProps) => (
+export const VerifyEmail = ({
+  username,
+  verifyUrl,
+  preview = "Confirmer votre adresse email",
+  title = `Vous y êtes presque ${username} !`,
+  message = "Pour vérifier votre compte, veuillez confirmer votre adresse e-mail.",
+  buttonLabel = "Confirmez votre email",
+}: VerifyEmailProps) => (
   <Tailwind
     config={{
       presets: [pixelBasedPreset],
@@ -39,7 +50,7 @@ export const VerifyEmail = ({ username, verifyUrl }: VerifyEmailProps) => (
   >
     <Html>
       <Body className="bg-bg-2 m-0 text-center font-sans">
-        <Preview>Confirmer votre adresse email</Preview>
+        <Preview>{preview}</Preview>
         <Container className="mobile:mt-0 mx-auto mt-8 w-full max-w-160">
           <Section>
             <Section className="bg-bg mobile:px-2 px-6 py-4">
@@ -74,15 +85,12 @@ export const VerifyEmail = ({ username, verifyUrl }: VerifyEmailProps) => (
                     className="mx-auto mb-5 block"
                   />
                   <Heading as="h1" className="font-28 text-fg m-0 font-sans">
-                    Vous y êtes presque {username} !
+                    {title}
                   </Heading>
                 </Section>
 
                 <Text className="font-16 text-fg-2 mx-auto mt-0 mb-8 max-w-95 text-center font-sans">
-                  Merci de vous être inscrit.
-                  <br />
-                  Pour vérifier votre compte, veuillez confirmer votre adresse
-                  e-mail.
+                  {message}
                 </Text>
 
                 <Section className="mb-6 text-center">
@@ -91,7 +99,7 @@ export const VerifyEmail = ({ username, verifyUrl }: VerifyEmailProps) => (
                     style={{ backgroundColor: "#F22222" }}
                     className="font-semibold text-fg-inverted inline-block text-white rounded-lg px-7 py-4 text-center font-sans leading-6"
                   >
-                    Confirmez votre email
+                    {buttonLabel}
                   </Button>
                 </Section>
 

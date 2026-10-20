@@ -36,7 +36,7 @@ export default function InventoryCardProduct({ products }: ProductProps) {
           {products.image && !products.image.startsWith("[object Object]") ? (
             <Image
               src={`/api/s3/image?key=${encodeURIComponent(products.image)}`}
-              alt={products.name}
+              alt={products.productName}
               width={144}
               height={164}
               unoptimized
@@ -52,8 +52,8 @@ export default function InventoryCardProduct({ products }: ProductProps) {
             </div>
           )}
           <div className="flex min-w-0 flex-1 flex-col">
-            <h4 className="truncate text-xl font-semibold">{products.name}</h4>
-            <p className="text-sm dark:text-gray-600">Téléconseiller(e)</p>
+            <h4 className="truncate text-xl font-semibold">{products.productName}</h4>
+            <p className="text-sm dark:text-gray-600 truncate mt-3">{products.description}</p>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
               {/* Badge du Prix d'achat */}

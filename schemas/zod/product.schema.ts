@@ -2,11 +2,10 @@ import z from "zod";
 
 export const productShcema = z
   .object({
-    id: z.string().uuid("L'identifiant du produit doit être un UUID valide").optional(),
     image: z
       .string({ message: "L'image du produit est requis" })
       .min(1, { message: "L'image est obligatoire" }),
-    name: z
+    productName: z
       .string()
       .min(1, { message: "Le nom du produit est requis" })
       .max(100, { message: "Le nom ne peut pas dépasser 100 caractères" }),
@@ -35,5 +34,3 @@ export const productShcema = z
     message: "Le prix de revente doit être supérieur ou égal au prix d'achat",
     path: ["sellingPrice"],
   });
-
-export type ProductSchemaDataForm = z.infer<typeof productShcema>;

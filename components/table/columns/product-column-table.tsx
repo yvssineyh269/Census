@@ -1,4 +1,3 @@
-import { ProductSchemaDataForm } from "@/schemas/zod/product.schema";
 import {
   columnFilteringFeature,
   columnVisibilityFeature,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { EllipsisVerticalIcon } from "lucide-react";
+import { ProductSchemaDataForm } from "@/lib/types";
 
 export const features = tableFeatures({
   columnFilteringFeature,
@@ -43,7 +43,7 @@ export const columns = columnHelper.columns([
   }),
 
   // -- NOM DU PRODUIT
-  columnHelper.accessor("name", {
+  columnHelper.accessor("productName", {
     header: "Nom du produit",
     cell: ({ row }) => <TableCellViewer item={row.original} />,
     enableHiding: false,
@@ -68,7 +68,7 @@ export const columns = columnHelper.columns([
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Enregistrement... ${row.original.name}`,
+            loading: `Enregistrement... ${row.original.productName}`,
             success: "Enregistrer",
             error: "Erreur",
           });
@@ -95,7 +95,7 @@ export const columns = columnHelper.columns([
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Enregistrement... ${row.original.name}`,
+            loading: `Enregistrement... ${row.original.productName}`,
             success: "Enregistrer avec succès",
             error: "Erreur d'enregistrement",
           });
@@ -122,7 +122,7 @@ export const columns = columnHelper.columns([
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Enregistrement... ${row.original.name}`,
+            loading: `Enregistrement... ${row.original.productName}`,
             success: "Enregistrer",
             error: "Erreur",
           });

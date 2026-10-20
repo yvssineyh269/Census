@@ -1,5 +1,7 @@
 import InventoryCardProduct from "@/components/inventory_card_product";
 import { getAllProducts } from "@/query/product.query";
+import Image from "next/image";
+import noProductInInventory from "@/public/no-product-in-inventory.svg"
 
 export default async function InventoryPage() {
   const products = await getAllProducts();
@@ -18,8 +20,19 @@ export default async function InventoryPage() {
       </div>
       {/* Cartes des produits */}
       {products.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-40 gap-2 text-muted-foreground">
-          <p className="text-xl font-medium">Pas de prduit sur la plateforme pour l'instant</p>
+        <div className="flex min-h-80 flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 px-6 py-10 text-center text-muted-foreground">
+          <Image
+            src={noProductInInventory}
+            alt="Aucun produit dans l’inventaire"
+            className="mb-5 h-32 w-32 object-contain rounded-full"
+          />
+          <h2 className="text-lg font-semibold text-foreground">
+            Aucun produit dans l’inventaire
+          </h2>
+          <p className="mt-2 max-w-md text-sm leading-relaxed">
+            Vous n’avez pas encore ajouté de produit à votre inventaire. Les
+            produits que vous ajouterez apparaîtront ici.
+          </p>
         </div>
       ) : (
             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

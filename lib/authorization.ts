@@ -26,3 +26,26 @@ export async function requireRole(requiredRole: Role) {
 
   return session;
 }
+
+// Rôles autorisés à gérer l'inventaire (produits et images)
+export const INVENTORY_ROLES: Role[] = ["admin", "manager", "assistant"];
+
+// Pour les server actions et routes API : renvoie la session si l'utilisateur
+// a l'un des rôles autorisés, sinon null (pas de redirect).
+export async function getSessionWithRole(allowedRoles: Role[]) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return null;
+  }
+
+  const userRole = session.user.role;
+
+  if (!isRole(userRole) || !allowedRoles.includes(userRole)) {
+    return null;
+  }
+
+  return session;
+}

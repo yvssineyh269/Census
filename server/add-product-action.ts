@@ -1,12 +1,20 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import {
-  ProductSchemaDataForm,
-  productShcema,
-} from "@/schemas/zod/product.schema";
+import { getSessionWithRole, INVENTORY_ROLES } from "@/lib/authorization";
+import { productShcema } from "@/schemas/zod/product.schema";
+import type { ProductSchemaDataForm } from "@/lib/types";
 
 export async function addProduct(data: ProductSchemaDataForm) {
+  const session = await getSessionWithRole(INVENTORY_ROLES);
+
+  if (!session) {
+    return {
+      status: "error",
+      message: "Vous n'êtes pas autorisé à ajouter un produit",
+    };
+  }
+
   const validation = productShcema.safeParse(data);
 
   try {

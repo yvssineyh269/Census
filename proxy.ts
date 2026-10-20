@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { routeAccessMap } from "./lib/settings";
 import { auth } from "./lib/auth";
+import { isRole, ROLE_HOME } from "./lib/roles";
 
 const matchers = Object.keys(routeAccessMap).map((route) => ({
   matcher: new RegExp(`^${route}$`),
@@ -26,8 +27,12 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/login", request.url));
       }
 
+      if (!isRole(role)) {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+
       if (!allowedRoles.includes(role)) {
-        return NextResponse.redirect(new URL(`/${role}`, request.url));
+        return NextResponse.redirect(new URL(ROLE_HOME[role], request.url));
       }
     }
   }

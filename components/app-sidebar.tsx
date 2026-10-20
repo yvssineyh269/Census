@@ -17,17 +17,22 @@ import {
 import logo from "@/public/next-step-logo.jpeg"
 import { menu, filterMenuByRole } from "@/lib/menu"
 import { authClient } from "@/lib/auth-client"
-import { isRole } from "@/lib/roles"
+import { isRole, ROLE_HOME } from "@/lib/roles"
+import type { StockAlertDto } from "@/lib/types"
 import Image from "next/image"
 import Link from "next/link"
 
 
-export function AppSidebar() {
+export function AppSidebar({
+  stockAlerts,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { stockAlerts: StockAlertDto[] | null }) {
   const { data: session } = authClient.useSession()
   const { isMobile, setOpenMobile } = useSidebar()
 
   const currentRole = isRole(session?.user.role) ? session.user.role : null
 
+  const visibleQuickAdd = filterMenuByRole(menu.quickAdd, currentRole)
   const visibleNavMain = filterMenuByRole(menu.navMain, currentRole)
   const visibleNavDocuments = filterMenuByRole(menu.documents, currentRole)
   const visibleNavSecondary = filterMenuByRole(menu.navSecondary, currentRole)
@@ -39,7 +44,7 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar collapsible="offcanvas">
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -47,7 +52,7 @@ export function AppSidebar() {
               asChild
               className="menu-[slot=sidebar-menu-button]:p-1.5! py-8"
             >
-              <Link href="/" onClick={closeMobileSidebar}>
+              <Link href={currentRole ? ROLE_HOME[currentRole] : "/"} onClick={closeMobileSidebar}>
                 <Image src={logo} alt="logo" className="size-10! rounded-lg" />
                 <div className="flex flex-col font-semibold">
                 <span className="text-base font-semibold">Census App</span>
@@ -59,7 +64,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={visibleNavMain} />
+        <NavMain items={visibleNavMain} quickAdd={visibleQuickAdd} stockAlerts={stockAlerts} />
         <NavDocuments items={visibleNavDocuments} />
         <NavSecondary items={visibleNavSecondary} className="mt-auto" />
       </SidebarContent>

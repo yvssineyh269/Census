@@ -1,8 +1,20 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+import { getStockAlerts } from "@/query/product.query"
 
-export default function DashboardLayout({children}: {children: React.ReactNode}) {
+// Rôles notifiés quand un produit atteint son seuil d'alerte de stock
+const STOCK_ALERT_ROLES = ["admin", "manager"]
+
+export default async function DashboardLayout({children}: {children: React.ReactNode}) {
+  const session = await auth.api.getSession({ headers: await headers() })
+  const stockAlerts =
+    session && STOCK_ALERT_ROLES.includes(session.user.role ?? "")
+      ? await getStockAlerts()
+      : null
+
   return (
     <SidebarProvider
       style={
@@ -12,7 +24,7 @@ export default function DashboardLayout({children}: {children: React.ReactNode})
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="inset" stockAlerts={stockAlerts} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

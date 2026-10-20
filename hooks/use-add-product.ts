@@ -1,5 +1,6 @@
 import { tryCatch } from "@/lib/try-catch";
-import { ProductSchemaDataForm, productShcema } from "@/schemas/zod/product.schema";
+import { ProductSchemaDataForm } from "@/lib/types";
+import { productShcema } from "@/schemas/zod/product.schema";
 import { addProduct } from "@/server/add-product-action";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -15,7 +16,7 @@ export function useAddProduct() {
         resolver: zodResolver(productShcema),
         defaultValues: {
             image: "",
-            name: "",
+            productName: "",
             description: "",
             purchasePrice: 0,
             sellingPrice: 0,
@@ -34,7 +35,7 @@ export function useAddProduct() {
             }
 
             toast.success("Produit a été ajouté à l'inventaire avec succès")
-            router.push("/admin/inventory")
+            router.push("/pages/inventory")
             router.refresh();
         });
     }

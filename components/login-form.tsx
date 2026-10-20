@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import slogan from "@/public/slogan.png";
+import loginImage from "@/public/login.svg";
 import logo from "@/public/next-step-logo.jpeg";
 
 import { Eye, EyeOff, Loader, LogIn, TowelRack } from "lucide-react";
@@ -112,7 +112,7 @@ export function LoginForm() {
               </Field>
               <div className="flex items-center">
                 <Link
-                  href="#"
+                  href="/forgot-password"
                   className="ml-auto text-sm underline-offset-2 hover:underline"
                 >
                   Mot de passe oublié ?
@@ -140,14 +140,14 @@ export function LoginForm() {
               </Field>
 
               <FieldDescription className="text-center">
-                Je n&apos;ai pas de compte <Link href="/signup">S&apos;inscrire</Link>
+                Pas encore de compte ? Contactez votre administrateur.
               </FieldDescription>
             </FieldGroup>
           </form>
 
           <div className="relative hidden bg-muted md:block">
             <Image
-              src={slogan}
+              src={loginImage}
               alt="Illustration de connexion"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />

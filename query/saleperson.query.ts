@@ -14,12 +14,12 @@ export const saleSelectBySaleperson = {
   product: {
     select: {
       id: true,
-      name: true,
+      productName: true,
       image: true,
     },
   },
 
-  validateBy: {
+  validatedBy: {
     select: {
       id: true,
       name: true,

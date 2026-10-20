@@ -8,7 +8,7 @@ export async function getAllProducts() {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
-      name: true,
+      productName: true,
       image: true,
       purchasePrice: true,
       sellingPrice: true,
@@ -40,13 +40,31 @@ export async function getAvailableProducts() {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
-      name: true,
+      productName: true,
       image: true,
       sellingPrice: true,
       quantity: true,
       commission: true,
       expiresAt: true,
       producedAt: true,
+    },
+  });
+}
+
+// Alertes de stock : produits dont la quantité est inférieure ou égale à leur seuil d'alerte (stockAlert, 5 par défaut)
+export async function getStockAlerts() {
+  return prisma.product.findMany({
+    where: {
+      ...activeScope,
+      quantity: { lte: prisma.product.fields.stockAlert },
+    },
+    orderBy: { quantity: "asc" },
+    select: {
+      id: true,
+      productName: true,
+      image: true,
+      quantity: true,
+      stockAlert: true,
     },
   });
 }

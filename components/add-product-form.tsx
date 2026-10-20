@@ -42,17 +42,17 @@ export default function AddProductForm() {
 
             {/* NOM DU PRODUIT */}
             <Field>
-              <FieldLabel htmlFor="name">Nom du produit</FieldLabel>
+              <FieldLabel htmlFor="productName">Nom du produit</FieldLabel>
               <Input
-                id="name"
+                id="productName"
                 type="text"
                 placeholder="Saisir le nom du produit"
-                {...register("name")}
+                {...register("productName")}
                 required
               />
-              {errors.name && (
+              {errors.productName && (
                 <FieldDescription className="text-sm text-destructive mt-1">
-                  {errors.name.message}
+                  {errors.productName.message}
                 </FieldDescription>
               )}
             </Field>
