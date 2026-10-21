@@ -8,11 +8,16 @@ import {
   getSalepersonMetrics,
   salepersonGetSales,
 } from "@/query/saleperson.query";
-import { getMarginChartData } from "@/query/margin.query";
-import { getAllUsers } from "@/query/user.query";
 import { getSalesHistoric } from "@/query/historic.query";
+import { getAllUsers } from "@/query/user.query";
+import { getMarginChartData } from "@/query/margin.query";
 import { productShcema } from "@/schemas/zod/product.schema";
 import z from "zod";
+
+// TYPE POUR LES UTILISATEURS : un utilisateur dans la liste du personnel
+export type UserListDto = Awaited<
+  ReturnType<typeof getAllUsers>
+>[0];
 
 // TYPE POUR LES DONNEES D'UN PRODUIT
 export type ProductSchemaDataForm = z.infer<typeof productShcema>;
@@ -48,11 +53,6 @@ export type SaleHistoricDto = Awaited<
 // TYPE D'UNE ALERTE DE STOCK : produit dont la quantité a atteint son seuil d'alerte
 export type StockAlertDto = Awaited<
   ReturnType<typeof getStockAlerts>
->[0];
-
-// TYPE D'UN UTILISATEUR DANS LA LISTE DU PERSONNEL
-export type UserListDto = Awaited<
-  ReturnType<typeof getAllUsers>
 >[0];
 
 // TYPE DES DONNEES DU GRAPHIQUE DES MARGES (brute / nette) sur une période
