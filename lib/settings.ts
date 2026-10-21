@@ -14,9 +14,11 @@ export const routeAccessMap : RouteAccessMap = {
     "/assistant(/.*)?": ["assistant"],
 
     "/pages/inventory(/.*)?": ["admin", "assistant", "manager"],
+    "/pages/inventory/[^/]+/edit": ["admin"],
     "/pages/historic(/.*)?": ["admin", "accountant", "manager"],
     "/pages/personnals(/.*)?": ["admin", "manager", "accountant"],
     "/pages/personnals/add(/.*)?": ["admin"],
+    "/pages/personnals/[^/]+/edit": ["admin"],
     // Toute autre page sous /pages exige au minimum d'être connecté
     "/pages(/.*)?": ["admin", "saleperson", "manager", "accountant", "assistant"],
 };

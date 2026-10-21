@@ -9,6 +9,14 @@ export const ROLE_HOME = {
 	accountant: "/accountant/dashboard",
 } satisfies Record<Role, string>;
 
+export const ROLE_LABELS = {
+	admin: "Administrateur(se)",
+	manager: "Manageur(se)",
+	assistant: "Assistant(e)",
+	accountant: "Comptable",
+	saleperson: "Télévendeur(se)",
+} satisfies Record<Role, string>;
+
 export function isRole(value: unknown): value is Role {
 	return (
 		typeof value === "string" &&

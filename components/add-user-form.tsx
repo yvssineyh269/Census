@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader, Send } from "lucide-react";
+import { Loader, Save, Send } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
@@ -15,18 +15,12 @@ import {
   SelectValue,
 } from "./ui/select";
 import { useAddUser } from "@/hooks/use-add-user";
-import type { Role } from "@/lib/roles";
+import { ROLE_LABELS } from "@/lib/roles";
+import type { UserListDto } from "@/lib/types";
 
-const ROLE_LABELS: Record<Role, string> = {
-  admin: "Administrateur(se)",
-  manager: "Manageur(se)",
-  assistant: "Assistant(e)",
-  accountant: "Comptable",
-  saleperson: "Télévendeur(se)",
-};
-
-export default function AddUserForm() {
-  const { form, isPending, handleAddUser } = useAddUser();
+// Sans "user" : création d'un compte. Avec "user" : modification de ce compte (admin).
+export default function AddUserForm({ user }: { user?: UserListDto }) {
+  const { form, isPending, handleAddUser } = useAddUser(user);
   const {
     register,
     handleSubmit,
@@ -66,9 +60,11 @@ export default function AddUserForm() {
                 {...register("email")}
                 required
               />
-              <FieldDescription>
-                Le lien d&apos;activation du compte sera envoyé à cette adresse.
-              </FieldDescription>
+              {!user && (
+                <FieldDescription>
+                  Le lien d&apos;activation du compte sera envoyé à cette adresse.
+                </FieldDescription>
+              )}
               {errors.email && (
                 <FieldDescription className="text-sm text-destructive mt-1">
                   {errors.email.message}
@@ -138,12 +134,12 @@ export default function AddUserForm() {
                 {isPending ? (
                   <>
                     <Loader className="animate-spin" />
-                    Création en cours...
+                    {user ? "Enregistrement..." : "Création en cours..."}
                   </>
                 ) : (
                   <>
-                    <Send />
-                    Créer et envoyer l&apos;invitation
+                    {user ? <Save /> : <Send />}
+                    {user ? "Enregistrer les modifications" : "Créer et envoyer l'invitation"}
                   </>
                 )}
               </Button>

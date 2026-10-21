@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader, Plus } from "lucide-react";
+import { Loader, Plus, Save } from "lucide-react";
 import ImageUploader from "./image-uploader";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
@@ -8,9 +8,12 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useAddProduct } from "@/hooks/use-add-product";
+import type { GetProductDetail } from "@/lib/types";
+import Image from "next/image";
 
-export default function AddProductForm() {
-  const { form, isPending, handleAddProduct } = useAddProduct();
+// Sans "product" : formulaire d'ajout. Avec "product" : formulaire de modification (admin).
+export default function AddProductForm({ product }: { product?: GetProductDetail }) {
+  const { form, isPending, handleAddProduct } = useAddProduct(product);
   const {
     register,
     handleSubmit,
@@ -25,7 +28,23 @@ export default function AddProductForm() {
           <FieldGroup>
             {/* IMAGE DU PRODUIT */}
             <Field>
+              {product?.image && (
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={`/api/s3/image?key=${encodeURIComponent(product.image)}`}
+                    alt={product.productName}
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className="size-16 rounded-md object-cover"
+                  />
+                  <FieldDescription>
+                    Image actuelle. Déposez une nouvelle image ci-dessous pour la remplacer.
+                  </FieldDescription>
+                </div>
+              )}
               <ImageUploader
+                data={product?.image}
                 onChange={(image) =>
                   setValue("image", image, {
                     shouldDirty: true,
@@ -187,12 +206,12 @@ export default function AddProductForm() {
             {isPending ? (
               <>
                 <Loader className="animate-spin" />
-                Ajout du nouveau produit en cours...
+                {product ? "Enregistrement des modifications..." : "Ajout du nouveau produit en cours..."}
               </>
             ) : (
               <>
-                <Plus />
-                Ajouter un nouveau produit
+                {product ? <Save /> : <Plus />}
+                {product ? "Enregistrer les modifications" : "Ajouter un nouveau produit"}
               </>
             )}
           </Button>

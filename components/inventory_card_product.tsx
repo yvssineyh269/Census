@@ -5,7 +5,6 @@ import {
   Pencil,
   Tag,
   TagPlus,
-  Trash,
   Wallet2,
 } from "lucide-react";
 import { Card } from "./ui/card";
@@ -16,6 +15,8 @@ import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { GetAllProductsType } from "@/lib/types";
+import { deleteProduct } from "@/server/product-action";
+import { ConfirmDeleteButton } from "./confirm-delete-button";
 
 const actionButtonClass = {
   variant: "outline" as const,
@@ -24,12 +25,14 @@ const actionButtonClass = {
 
 interface ProductProps {
   products: GetAllProductsType;
+  // Modifier / Supprimer réservés à l'admin
+  isAdmin: boolean;
 }
 
 const badgeClassName =
   "bg-primary-gradient flex h-7 w-full min-w-0 justify-start gap-1 tabular-nums";
 
-export default function InventoryCardProduct({ products }: ProductProps) {
+export default function InventoryCardProduct({ products, isAdmin }: ProductProps) {
   return (
       <Card className="gap-0 overflow-hidden py-0 transition-shadow hover:shadow-lg">
         <div className="flex items-stretch gap-3 p-2">
@@ -79,7 +82,7 @@ export default function InventoryCardProduct({ products }: ProductProps) {
               </Badge>
             </div>
 
-            <div className="mt-auto grid grid-cols-4 gap-2 pt-3">
+            <div className={cn("mt-auto grid gap-2 pt-3", isAdmin ? "grid-cols-4" : "grid-cols-2")}>
               <Link
                 href="#"
                 aria-label="Voir"
@@ -92,17 +95,19 @@ export default function InventoryCardProduct({ products }: ProductProps) {
                 <Eye />
               </Link>
 
-              <Link
-                href="#"
-                aria-label="Modifier"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "icon" }),
-                  actionButtonClass,
-                  "bg-indigo-200",
-                )}
-              >
-                <Pencil />
-              </Link>
+              {isAdmin && (
+                <Link
+                  href={`/pages/inventory/${products.id}/edit`}
+                  aria-label="Modifier"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "icon" }),
+                    actionButtonClass,
+                    "bg-indigo-200",
+                  )}
+                >
+                  <Pencil />
+                </Link>
+              )}
 
               <Link
                 href="#"
@@ -116,17 +121,13 @@ export default function InventoryCardProduct({ products }: ProductProps) {
                 <FilePieChart />
               </Link>
 
-              <Link
-                href="#"
-                aria-label="Supprimer"
-                className={cn(
-                  buttonVariants({ variant: "destructive", size: "icon" }),
-                  actionButtonClass,
-                  "bg-red-200",
-                )}
-              >
-                <Trash />
-              </Link>
+              {isAdmin && (
+                <ConfirmDeleteButton
+                  title={`Supprimer « ${products.productName} » ?`}
+                  description="Le produit sera retiré de l'inventaire et ne pourra plus être vendu. L'historique de ses ventes est conservé."
+                  action={deleteProduct.bind(null, products.id)}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { description } from "@/components/chart-area-interactive";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
@@ -12,7 +11,7 @@ interface Props {
     description?: string
 }
 
-export default function MetricCard({ title, value, unit, trend, trendLabel }: Props) {
+export default function MetricCard({ title, value, unit, trend, trendLabel, description }: Props) {
 
     // -- 
     const isUp = trend !== null && trend !== undefined && trend >= 0

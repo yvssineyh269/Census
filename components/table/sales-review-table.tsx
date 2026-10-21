@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckIcon, Trash2Icon, XIcon } from "lucide-react";
 import type { SaleHistoricDto } from "@/lib/types";
+import { COMOROS_TIME_ZONE } from "@/lib/week-range";
 import type { Role } from "@/lib/roles";
 import { useSaleStatus } from "@/hooks/use-sale-status";
 import { CardContent } from "../ui/card";
@@ -64,6 +65,7 @@ const FILTERS: { value: StatusFilter; label: string }[] = [
 
 const formatDate = (date: Date) =>
   new Date(date).toLocaleDateString("fr-FR", {
+        timeZone: COMOROS_TIME_ZONE,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

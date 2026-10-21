@@ -13,14 +13,6 @@ import { DragHandle } from "../drag/drag-table";
 import { TableCellViewer } from "../table-cell-viewer";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { EllipsisVerticalIcon } from "lucide-react";
 import { ProductSchemaDataForm } from "@/lib/types";
 
 export const features = tableFeatures({
@@ -136,29 +128,6 @@ export const columns = columnHelper.columns([
           readOnly
         />
       </form>
-    ),
-  }),
-
-  // -- BOUTON D'ELLIPSIS VERTICAL POUR LES ACTIONS (MODIFIER / SUPPRIMER)
-  columnHelper.display({
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex size-8 text-muted-foreground"
-            size="icon"
-          >
-            <EllipsisVerticalIcon />
-            <span className="sr-only">Plus d'option</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Modifier</DropdownMenuItem>
-          <DropdownMenuItem variant="destructive">Supprimer</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     ),
   }),
 ]);

@@ -17,6 +17,7 @@ import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SaleHistoricDto } from "@/lib/types";
+import { COMOROS_TIME_ZONE } from "@/lib/week-range";
 
 export const historicFeatures = tableFeatures({
   columnFilteringFeature,
@@ -38,6 +39,7 @@ const columnHelper = createColumnHelper<typeof historicFeatures, SaleHistoricDto
 const formatDate = (date: Date | null) =>
   date
     ? new Date(date).toLocaleDateString("fr-FR", {
+        timeZone: COMOROS_TIME_ZONE,
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
