@@ -91,7 +91,7 @@ export const menu = {
       title: "Crédit et dépenses",
       url: "/assistance",
       icon: BanknoteArrowDown,
-      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
+      visibleBy: ["admin", "accountant", "manager"] as Role[],
     },
   ],
 

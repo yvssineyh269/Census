@@ -2,15 +2,12 @@
 import AdminCards from "@/components/card/admin-card"
 import { ChartBarInteractive } from "@/components/chart-bar-interactive"
 import { getMarginChartData } from "@/query/margin.query"
-import { getCurrentSession } from "@/server/current-session";
 import SalesReviewTable from "@/components/table/sales-review-table";
 import { getSalesHistoric } from "@/query/historic.query";
 
 
 export default async function AdminPage() {
-  
-  const session = await getCurrentSession();
-  const sales = await getSalesHistoric();
+    const sales = await getSalesHistoric();
   const marginChart = await getMarginChartData("week", 0);
   
   return (

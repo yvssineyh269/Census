@@ -81,7 +81,7 @@ export default function SalesReviewTable({
   role: Role;
 }) {
   const isAdmin = role === "admin";
-  const isValidator = role === "manager" || role === "accountant";
+  const isValidator = role === "manager" || role === "accountant" || role === "assistant";
   // Le télévendeur ne voit que ses propres ventes : la colonne "Vendeur" est inutile
   const isSaleperson = role === "saleperson";
   const [filter, setFilter] = useState<StatusFilter>(isValidator ? "pending" : "all");
@@ -124,7 +124,7 @@ export default function SalesReviewTable({
               <TableHead>Statut</TableHead>
               <TableHead>Traitée par</TableHead>
               <TableHead>Note</TableHead>
-              {!isSaleperson && <TableHead className="text-right"></TableHead>}
+              {!isSaleperson && <TableHead className="text-center">Actions</TableHead>}
             </TableRow>
           </TableHeader>
 
@@ -182,7 +182,7 @@ export default function SalesReviewTable({
                     </TableCell>
                     {!isSaleperson && (
                     <TableCell>
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-center gap-2">
                         {/* MANAGER / COMPTABLE : valider ou annuler une vente en attente */}
                         {isValidator && sale.status === "pending" && (
                           <>

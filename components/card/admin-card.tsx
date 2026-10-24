@@ -1,13 +1,6 @@
 import { getWeeklyMarginTotals } from "@/query/margin.query";
 import MetricCard from "./metric/metric-card";
-
-// Évolution en % par rapport à la semaine dernière (arrondie à 0,1)
-function getGrowthRate(current: number, previous: number) {
-    if (previous === 0) return current === 0 ? 0 : 100;
-    return Math.round(((current - previous) / Math.abs(previous)) * 1000) / 10;
-}
-
-const trendLabel = (rate: number) => `${rate >= 0 ? "+" : ""}${rate}% vs semaine dernière`;
+import { getGrowthRate, trendLabel } from "@/server/growth-rate";
 
 // Cartes de l'admin : résultats de la semaine en cours, remis à zéro chaque samedi à 13h (heure des Comores)
 export default async function AdminCards() {

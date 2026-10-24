@@ -15,12 +15,12 @@ function toResult(error: unknown) {
   return { status: "error", message: "Une erreur inattendue est survenue" };
 }
 
-// VALIDER UNE VENTE (manager, accountant) : pending → validated et décrémente le stock
+// VALIDER UNE VENTE (manager, accountant, assistant) : pending → validated et décrémente le stock
 export async function validateSale(saleId: string) {
-  const session = await getSessionWithRole(["manager", "accountant"]);
+  const session = await getSessionWithRole(["manager", "accountant", "assistant"]);
 
   if (!session) {
-    return { status: "error", message: "Seuls un manager ou un comptable peuvent valider une vente" };
+    return { status: "error", message: "Seuls un manager, un comptable ou un(e) assistant(e) peuvent valider une vente" };
   }
 
   try {
@@ -63,10 +63,10 @@ export async function validateSale(saleId: string) {
 }
 
 // ANNULER UNE VENTE
-// - manager, accountant : pending → cancelled, note de justification obligatoire
+// - manager, accountant, assistant : pending → cancelled, note de justification obligatoire
 // - admin : correction d'une vente validée à tort (validated → cancelled), le stock est rendu
 export async function cancelSale(saleId: string, note: string) {
-  const session = await getSessionWithRole(["manager", "accountant", "admin"]);
+  const session = await getSessionWithRole(["manager", "accountant", "assistant", "admin"]);
 
   if (!session) {
     return { status: "error", message: "Vous n'êtes pas autorisé à annuler une vente" };
