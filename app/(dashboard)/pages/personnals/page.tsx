@@ -31,8 +31,7 @@ export default async function PersonnalsPage() {
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold">Personnels</h1>
           <p className="text-muted-foreground mt-3">
-            {users.length} employé{users.length > 1 ? "s" : ""}, répartis par rôle. Les résultats des
-            télévendeurs portent sur les ventes validées de la semaine en cours.
+            Les résultats des télévendeurs portent sur les ventes validées de la semaine en cours.
           </p>
         </div>
         {/* Seul l'admin peut créer un compte */}
@@ -42,7 +41,7 @@ export default async function PersonnalsPage() {
             className={cn(buttonVariants(), "bg-primary-gradient text-white hover:bg-primary-gradient-hover")}
           >
             <UserPlusIcon />
-            Ajouter un employé
+            Ajouter un utilisateur
           </Link>
         )}
       </div>

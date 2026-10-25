@@ -9,7 +9,6 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useAddProduct } from "@/hooks/use-add-product";
 import type { GetProductDetail } from "@/lib/types";
-import Image from "next/image";
 
 // Sans "product" : formulaire d'ajout. Avec "product" : formulaire de modification (admin).
 export default function AddProductForm({ product }: { product?: GetProductDetail }) {
@@ -28,21 +27,6 @@ export default function AddProductForm({ product }: { product?: GetProductDetail
           <FieldGroup>
             {/* IMAGE DU PRODUIT */}
             <Field>
-              {product?.image && (
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={`/api/s3/image?key=${encodeURIComponent(product.image)}`}
-                    alt={product.productName}
-                    width={64}
-                    height={64}
-                    unoptimized
-                    className="size-16 rounded-md object-cover"
-                  />
-                  <FieldDescription>
-                    Image actuelle. Déposez une nouvelle image ci-dessous pour la remplacer.
-                  </FieldDescription>
-                </div>
-              )}
               <ImageUploader
                 data={product?.image}
                 onChange={(image) =>

@@ -30,7 +30,11 @@ interface ImageUplaodProps {
   onChange?: (data: string) => void;
 }
 
+// Seules les URL locales (blob:) créées pour l'aperçu doivent être libérées
+const isBlobUrl = (url?: string): url is string => !!url && url.startsWith("blob:");
+
 export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
+  // En modification, l'image actuelle du produit est affichée directement dans le champ
   const [fileState, setFileState] = useState<ImageUploaderState>({
     progress: 0,
     file: null,
@@ -40,6 +44,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
     isDeleting: false,
     fileType: "image",
     key: data,
+    objectUrl: data ? `/api/s3/image?key=${encodeURIComponent(data)}` : undefined,
   });
 
   async function uploadFile(file: File) {
@@ -133,7 +138,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
       if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
 
-        if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        if (isBlobUrl(fileState.objectUrl)) {
           URL.revokeObjectURL(fileState.objectUrl);
         }
         setFileState({
@@ -162,15 +167,20 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
         isDeleting: true,
       }));
 
-      const response = await fetch("/api/s3/delete", {
-        method: "DELETE",
-        headers: { ContentType: "application/json" },
-        body: JSON.stringify({
-          key: fileState.key,
-        }),
-      });
+      // L'image actuelle du produit n'est pas supprimée du stockage : le produit l'utilise
+      // tant que la modification n'est pas enregistrée
+      const isCurrentProductImage = !!data && fileState.key === data;
+      const response = isCurrentProductImage
+        ? null
+        : await fetch("/api/s3/delete", {
+            method: "DELETE",
+            headers: { ContentType: "application/json" },
+            body: JSON.stringify({
+              key: fileState.key,
+            }),
+          });
 
-      if (!response.ok) {
+      if (response && !response.ok) {
         toast.error("Failed to remove file from storage");
         setFileState((prev) => ({
           ...prev,
@@ -181,7 +191,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
         return;
       }
 
-      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+      if (isBlobUrl(fileState.objectUrl)) {
         URL.revokeObjectURL(fileState.objectUrl);
       }
       onChange?.("");
@@ -265,7 +275,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
 
   useEffect(() => {
     return () => {
-      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+      if (isBlobUrl(fileState.objectUrl)) {
         URL.revokeObjectURL(fileState.objectUrl);
       }
     };

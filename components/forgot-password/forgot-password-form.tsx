@@ -9,11 +9,19 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import logo from "@/public/next-step-logo.jpeg"
 import forgotPasswordImage from "@/public/forgot-password.svg"
-import { ArrowRight, Loader } from "lucide-react";
+import { ArrowRight, Loader, MailCheck } from "lucide-react";
 import { useForgotPassword } from "@/hooks/use-forgot-password";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "../ui/dialog";
 
 export default function ForgotPasswordForm() {
-    const { form, isPending, handleForgotPassword } = useForgotPassword();
+    const { form, isPending, sentTo, resetSent, handleForgotPassword } = useForgotPassword();
     const { register, handleSubmit, formState: { errors } } = form;
     return (
         <div className={cn("flex flex-col gap-6")}>
@@ -98,6 +106,31 @@ export default function ForgotPasswordForm() {
                 <Link href="#">Conditions d&apos;utilisation</Link> et notre{" "}
                 <Link href="#">Politique de confidentialité</Link>.
             </FieldDescription>
+
+            {/* Confirmation d'envoi du lien de réinitialisation */}
+            <Dialog open={!!sentTo} onOpenChange={(open) => !open && resetSent()}>
+                <DialogContent>
+                    <DialogHeader>
+                        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
+                            <MailCheck className="size-6 text-primary" />
+                        </div>
+                        <DialogTitle className="text-center">Vérifiez votre boîte mail</DialogTitle>
+                        <DialogDescription className="text-center">
+                            Si un compte est associé à <span className="font-medium text-foreground">{sentTo}</span>,
+                            un email contenant un lien pour réinitialiser votre mot de passe vient de lui être envoyé.
+                            Pensez à vérifier vos courriers indésirables.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="sm:justify-center">
+                        <Button variant="outline" onClick={resetSent}>
+                            Utiliser une autre adresse
+                        </Button>
+                        <Button asChild className="bg-primary-gradient">
+                            <Link href="/login">Retour à la connexion</Link>
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

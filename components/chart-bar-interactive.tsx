@@ -19,6 +19,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { tryCatch } from "@/lib/try-catch"
 import type { Period } from "@/lib/period-range"
 import { COMOROS_TIME_ZONE } from "@/lib/week-range"
@@ -46,6 +47,9 @@ const PERIOD_OPTIONS: { value: Period; label: string }[] = [
   { value: "month", label: "Mensuel" },
   { value: "quarter", label: "Trimestriel" },
 ]
+
+// Bouton de navigation : dégradé de la marque au survol et au clic
+const NAV_BUTTON_CLASS = "size-8 hover:bg-primary-gradient hover:text-white active:bg-primary-gradient active:text-white"
 
 const formatDay = (value: string, withYear = false) =>
   new Date(value).toLocaleDateString("fr-FR", {
@@ -119,6 +123,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
                 key={option.value}
                 size="sm"
                 variant={chart.period === option.value ? "default" : "outline"}
+                className={cn(chart.period === option.value && "bg-primary-gradient text-white")}
                 disabled={isPending}
                 onClick={() => loadChart(option.value, 0)}
               >
@@ -130,7 +135,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
               <Button
                 size="icon"
                 variant="outline"
-                className="size-8"
+                className={NAV_BUTTON_CLASS}
                 disabled={isPending}
                 onClick={() => loadChart(chart.period, chart.offset - 1)}
               >
@@ -140,7 +145,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
               <Button
                 size="icon"
                 variant="outline"
-                className="size-8"
+                className={NAV_BUTTON_CLASS}
                 disabled={isPending || chart.offset === 0}
                 onClick={() => loadChart(chart.period, chart.offset + 1)}
               >

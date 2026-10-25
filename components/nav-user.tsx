@@ -22,7 +22,6 @@ import {
   EllipsisVerticalIcon,
   CircleUserRoundIcon,
   CreditCardIcon,
-  BellIcon,
   LogOutIcon,
 } from "lucide-react";
 

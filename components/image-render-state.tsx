@@ -63,7 +63,7 @@ export function ImageRenderUploadedState({
 }) {
   return (
     <div>
-      <Image src={previewUrl} alt="image" fill className="object-contain p-2" />
+      <Image src={previewUrl} alt="image" fill unoptimized className="object-contain p-2" />
 
       <Button
         variant={"destructive"}

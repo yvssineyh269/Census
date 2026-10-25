@@ -30,9 +30,9 @@ export function StockAlertViewer({ alerts }: { alerts: StockAlertDto[] }) {
           className="relative size-8 group-data-[collapsible=icon]:opacity-0"
           variant="outline"
         >
-          {hasAlerts ? <BellDot className="text-red-600" /> : <Bell />}
+          {hasAlerts ? <Bell size={8!} className="text-destructive" /> : <Bell />}
           {hasAlerts && (
-            <span className="absolute -top-1.5 -right-1.5 flex min-w-4 h-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+            <span className="absolute -top-1.5 -right-1.5 flex min-w-4 h-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-white">
               {alerts.length}
             </span>
           )}
@@ -42,7 +42,7 @@ export function StockAlertViewer({ alerts }: { alerts: StockAlertDto[] }) {
 
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Alertes de stock</DrawerTitle>
+          <DrawerTitle className="text-xl font-bold">Alertes de stock</DrawerTitle>
           <DrawerDescription>
             {hasAlerts
               ? `${alerts.length} produit${alerts.length > 1 ? "s ont" : " a"} atteint le seuil d'alerte.`
