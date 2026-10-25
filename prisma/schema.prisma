@@ -109,6 +109,10 @@ model Sale {
   updatedAt     DateTime  @updatedAt
   salepersonId  String
   validatorId   String?
+  // Rôle du validateur au moment de la validation, figé même s'il change de poste ensuite
+  validatorRole String?
+  // Commission due à l'assistant(e) s'il/elle a validé la vente (0 sinon), figée à la validation
+  assistantCommission Float @default(0)
   cancelledById String?
   productId     String
   cancelledBy   User?     @relation("SaleCancelledBy", fields: [cancelledById], references: [id])

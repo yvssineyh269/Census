@@ -12,8 +12,8 @@ export default async function AdminCards() {
     const metrics = [
         { title: "Chiffre d'affaires", value: current.revenue, previous: previous.revenue, description: `${current.salesCount} vente${current.salesCount > 1 ? "s" : ""} validée${current.salesCount > 1 ? "s" : ""} cette semaine` },
         { title: "Marge brute", value: current.gross, previous: previous.gross, description: "Prix de vente − prix d'achat" },
-        { title: "Marge nette", value: current.net, previous: previous.net, description: "Marge brute − commissions" },
-        { title: "Commissions", value: current.commission, previous: previous.commission, description: "Commissions dues aux télévendeurs" },
+        { title: "Marge nette", value: current.net, previous: previous.net, description: "Marge brute − commissions (télévendeurs + assistant(e))" },
+        { title: "Commissions", value: current.commission, previous: previous.commission, description: "Dues aux télévendeurs et à l'assistant(e)" },
     ];
 
     return (

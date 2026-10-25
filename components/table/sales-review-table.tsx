@@ -99,6 +99,7 @@ export default function SalesReviewTable({
             key={item.value}
             size="sm"
             variant={filter === item.value ? "default" : "outline"}
+            className={filter === item.value ? "bg-primary-gradient text-white" : undefined}
             onClick={() => setFilter(item.value)}
           >
             {item.label}
@@ -167,11 +168,11 @@ export default function SalesReviewTable({
                     {!isSaleperson && <TableCell>{sale.saleperson.name}</TableCell>}
                     <TableCell className="whitespace-nowrap">
                       {sale.sellingPrice.toLocaleString("fr-FR")}{" "}
-                      <span className="text-sm text-indigo-600">KMF</span>
+                      <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {sale.commission.toLocaleString("fr-FR")}{" "}
-                      <span className="text-sm text-orange-600">KMF</span>
+                      <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
                     </TableCell>
                     <TableCell>
                       <Badge className={STATUS_CLASS[sale.status]}>{STATUS_LABEL[sale.status]}</Badge>

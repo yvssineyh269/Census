@@ -28,7 +28,7 @@ export async function requireRole(requiredRole: Role) {
 }
 
 // Rôles autorisés à gérer l'inventaire (produits et images)
-export const INVENTORY_ROLES: Role[] = ["admin", "manager", "assistant"];
+export const INVENTORY_ROLES: Role[] = ["admin", "manager"];
 
 // Pour les server actions et routes API : renvoie la session si l'utilisateur
 // a l'un des rôles autorisés, sinon null (pas de redirect).

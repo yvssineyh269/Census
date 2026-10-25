@@ -37,7 +37,7 @@ export const menu = {
       title: "Inventaire",
       url: "/pages/inventory",
       icon: ListIcon,
-      visibleBy: ["admin", "assistant", "manager"] as Role[],
+      visibleBy: ["admin", "manager"] as Role[],
     },
     {
       title: "Analyse",
@@ -107,7 +107,7 @@ export const menu = {
       title: "Nouveau produit",
       url: "/pages/inventory/add",
       icon: PackagePlusIcon,
-      visibleBy: ["admin", "assistant", "manager"] as Role[],
+      visibleBy: ["admin", "manager"] as Role[],
     },
     {
       title: "Nouvel utilisateur",

@@ -11,8 +11,8 @@ export default async function ManagerCards() {
     const metrics = [
         { title: "Chiffre d'affaires", value: current.revenue, previous: previous.revenue, description: `${current.salesCount} vente${current.salesCount > 1 ? "s" : ""} validée${current.salesCount > 1 ? "s" : ""} cette semaine` },
         { title: "Marge brute", value: current.gross, previous: previous.gross, description: "Prix de vente − prix d'achat" },
-        { title: "Marge nette", value: current.net, previous: previous.net, description: "Marge brute − commissions" },
-        { title: "Commissions", value: current.commission, previous: previous.commission, description: "Commissions dues aux télévendeurs" },
+        { title: "Marge nette", value: current.net, previous: previous.net, description: "Marge brute − commissions (télévendeurs + assistant(e))" },
+        { title: "Commissions", value: current.commission, previous: previous.commission, description: "Dues aux télévendeurs et à l'assistant(e)" },
     ];
     return (
         <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">

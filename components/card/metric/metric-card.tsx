@@ -22,7 +22,7 @@ export default function MetricCard({ title, value, unit, trend, trendLabel, desc
                 <CardDescription>{title}</CardDescription>
                 <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
                     {typeof value === "number" ? value.toLocaleString("fr-FR") : value}
-                    {unit && <span className="text-primary text-xs ml-1">{unit}</span>}
+                    {unit && <span className="bg-clip-text text-transparent bg-primary-gradient text-xs ml-1">{unit}</span>}
                 </CardTitle>
                 <CardAction>
                     <Badge

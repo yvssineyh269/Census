@@ -3,7 +3,7 @@ import { getPeriodRange, type Period } from "@/lib/period-range";
 
 // Marges des ventes validées sur une période, par jour :
 // - marge brute = prix de vente − prix d'achat
-// - marge nette = marge brute − commission du télévendeur
+// - marge nette = marge brute − commission du télévendeur − commission de l'assistant(e) (figée à la validation)
 // Le prix d'achat est celui actuellement enregistré sur le produit (la vente ne le mémorise pas).
 export async function getMarginChartData(period: Period, offset: number) {
   const { start, end, buckets } = getPeriodRange(period, offset);
@@ -19,6 +19,7 @@ export async function getMarginChartData(period: Period, offset: number) {
       commission: true,
       quantity: true,
       product: { select: { purchasePrice: true } },
+      assistantCommission: true,
     },
   });
 
@@ -36,7 +37,7 @@ export async function getMarginChartData(period: Period, offset: number) {
 
     const gross = (sale.sellingPrice - sale.product.purchasePrice) * sale.quantity;
     data[index].gross += gross;
-    data[index].net += gross - sale.commission * sale.quantity;
+    data[index].net += gross - sale.commission * sale.quantity - sale.assistantCommission;
   }
 
   return {
@@ -51,7 +52,7 @@ export async function getMarginChartData(period: Period, offset: number) {
 }
 
 // Totaux d'une semaine de travail (offset 0 = semaine en cours, -1 = semaine dernière) :
-// chiffre d'affaires, marge brute, marge nette et commissions des ventes validées
+// chiffre d'affaires, marge brute, marge nette et commissions (télévendeurs + assistant(e)) des ventes validées
 export async function getWeeklyMarginTotals(offset = 0) {
   const { start, end } = getPeriodRange("week", offset);
 
@@ -65,6 +66,7 @@ export async function getWeeklyMarginTotals(offset = 0) {
       commission: true,
       quantity: true,
       product: { select: { purchasePrice: true } },
+      assistantCommission: true,
     },
   });
 
@@ -72,7 +74,7 @@ export async function getWeeklyMarginTotals(offset = 0) {
     (totals, sale) => {
       const revenue = sale.sellingPrice * sale.quantity;
       const gross = revenue - sale.product.purchasePrice * sale.quantity;
-      const commission = sale.commission * sale.quantity;
+      const commission = sale.commission * sale.quantity + sale.assistantCommission;
       return {
         salesCount: totals.salesCount + 1,
         revenue: totals.revenue + revenue,

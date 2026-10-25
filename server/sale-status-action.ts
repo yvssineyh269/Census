@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { getSessionWithRole } from "@/lib/authorization";
 import { cancelSaleSchema } from "@/schemas/zod/sale.schema";
+import { ASSISTANT_COMMISSION_PER_SALE } from "@/query/assistant.query";
 
 // Erreur métier dont le message peut être affiché tel quel à l'utilisateur
 class SaleActionError extends Error {}
@@ -45,10 +46,19 @@ export async function validateSale(saleId: string) {
       }
 
       // Le filtre sur le status empêche une double validation simultanée
+      // Le rôle et la commission de l'assistant(e) sont figés à la validation
       const now = new Date();
+      const validatorRole = session.user.role;
       const updated = await tx.sale.updateMany({
         where: { id: saleId, status: "pending" },
-        data: { status: "validated", validatedAt: now, soldAt: now, validatorId: session.user.id },
+        data: {
+          status: "validated",
+          validatedAt: now,
+          soldAt: now,
+          validatorId: session.user.id,
+          validatorRole,
+          assistantCommission: validatorRole === "assistant" ? ASSISTANT_COMMISSION_PER_SALE : 0,
+        },
       });
 
       if (updated.count === 0) {
