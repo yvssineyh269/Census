@@ -9,7 +9,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 // Période demandée, décalée de "offset" périodes dans le passé (0 = en cours, -1 = précédente...)
 // Toutes les bornes sont en heure des Comores :
-// - week    : semaine de travail (samedi 13h → samedi 13h), découpée en 7 journées de 24h
+// - week    : semaine de travail (samedi 13h → samedi 13h), découpée par jour (minuit → minuit)
 // - month   : mois civil, découpé par jour (minuit → minuit)
 // - quarter : trimestre civil (janv-mars, avr-juin...), découpé par jour
 export function getPeriodRange(period: Period, offset: number) {
@@ -30,10 +30,17 @@ export function getPeriodRange(period: Period, offset: number) {
     end = fromComorosTime(local.getUTCFullYear(), startMonth + monthsPerPeriod);
   }
 
-  // Pas d'heure d'été aux Comores : un jour fait toujours 24h
+  // Journées calendaires (minuit → minuit, heure des Comores), rognées aux bornes de la période :
+  // la semaine donne donc un samedi après-midi (dès 13h), dimanche → vendredi, puis un samedi matin (jusqu'à 13h)
+  const local = toComorosWallClock(start);
+  const firstMidnight = fromComorosTime(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate());
   const buckets: Bucket[] = [];
-  for (let cursor = start.getTime(); cursor < end.getTime(); cursor += DAY_MS) {
-    buckets.push({ start: new Date(cursor), end: new Date(cursor + DAY_MS) });
+  // Pas d'heure d'été aux Comores : un jour fait toujours 24h
+  for (let cursor = firstMidnight.getTime(); cursor < end.getTime(); cursor += DAY_MS) {
+    buckets.push({
+      start: new Date(Math.max(cursor, start.getTime())),
+      end: new Date(Math.min(cursor + DAY_MS, end.getTime())),
+    });
   }
 
   return { start, end, buckets };

@@ -25,6 +25,7 @@ import type { Period } from "@/lib/period-range"
 import { COMOROS_TIME_ZONE } from "@/lib/week-range"
 import type { MarginChartDto } from "@/lib/types"
 import { fetchMarginChart } from "@/server/margin-chart-action"
+import { useMemo, useState, useTransition } from "react"
 
 const chartConfig = {
   margin: {
@@ -82,11 +83,11 @@ function getPeriodTitle(chart: MarginChartDto) {
 }
 
 export function ChartBarInteractive({ initialChart }: { initialChart: MarginChartDto }) {
-  const [chart, setChart] = React.useState(initialChart)
-  const [activeChart, setActiveChart] = React.useState<MarginKey>("gross")
-  const [isPending, startTransition] = React.useTransition()
+  const [chart, setChart] = useState(initialChart)
+  const [activeChart, setActiveChart] = useState<MarginKey>("gross")
+  const [isPending, startTransition] = useTransition()
 
-  const total = React.useMemo(
+  const total = useMemo(
     () => ({
       gross: chart.data.reduce((acc, curr) => acc + curr.gross, 0),
       net: chart.data.reduce((acc, curr) => acc + curr.net, 0),
@@ -172,7 +173,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
                 }`}
               >
                 {total[key].toLocaleString("fr-FR")}
-                <span className="ml-1 text-xs font-normal text-orange-600">KMF</span>
+                <span className="ml-1 text-xs font-normal bg-clip-text bg-transparent text-primary-gradient">KMF</span>
               </span>
             </button>
           ))}
@@ -181,7 +182,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-62.5 w-full"
         >
           <BarChart
             accessibilityLayer
@@ -203,7 +204,7 @@ export function ChartBarInteractive({ initialChart }: { initialChart: MarginChar
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  className="w-[170px]"
+                  className="w-42.5"
                   nameKey="margin"
                   labelFormatter={(value) => formatDay(value, true)}
                   formatter={(value) => (
