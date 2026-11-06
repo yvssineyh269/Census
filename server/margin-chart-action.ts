@@ -1,14 +1,12 @@
 "use server";
 
-import { getSessionWithRole } from "@/lib/authorization";
+import { getSessionWithRole, MARGIN_ROLES } from "@/lib/authorization";
 import { PERIODS, type Period } from "@/lib/period-range";
-import { getMarginChartData } from "@/query/margin.query";
+import { getDailyMarginTotals, getMarginChartData } from "@/query/margin.query";
 
-// Rôles autorisés à consulter les marges (informations financières)
-const MARGIN_ROLES = ["admin", "manager", "accountant"] as const;
 
 export async function fetchMarginChart(period: Period, offset: number) {
-  const session = await getSessionWithRole([...MARGIN_ROLES]);
+  const session = await getSessionWithRole(MARGIN_ROLES);
 
   if (!session) {
     return { status: "error" as const, message: "Vous n'êtes pas autorisé à consulter les marges" };
@@ -21,4 +19,20 @@ export async function fetchMarginChart(period: Period, offset: number) {
 
   const chart = await getMarginChartData(period, offset);
   return { status: "success" as const, chart };
+}
+
+// Totaux d'une journée (YYYY-MM-DD, heure des Comores) pour les cartes d'analyse
+export async function fetchDailyMargin(day: string) {
+  const session = await getSessionWithRole(MARGIN_ROLES);
+
+  if (!session) {
+    return { status: "error" as const, message: "Vous n'êtes pas autorisé à consulter les marges" };
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day))) {
+    return { status: "error" as const, message: "Date invalide" };
+  }
+
+  const daily = await getDailyMarginTotals(day);
+  return { status: "success" as const, daily };
 }

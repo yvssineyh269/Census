@@ -1,4 +1,4 @@
-import InventoryCardProduct from "@/components/inventory_card_product";
+import InventorySearch from "@/components/inventory-search";
 import { getAllProducts } from "@/query/product.query";
 import { getCurrentSession } from "@/server/current-session";
 import Image from "next/image";
@@ -7,6 +7,8 @@ import noProductInInventory from "@/public/no-product-in-inventory.svg"
 export default async function InventoryPage() {
   const [session, products] = await Promise.all([getCurrentSession(), getAllProducts()]);
   const isAdmin = session.user.role === "admin";
+  // Mêmes rôles que l'entrée "Nouveau produit" du menu (lib/menu.ts)
+  const canAddProduct = isAdmin || session.user.role === "manager";
   return (
     <div className="px-4 py-6 sm:py-10 space-y-4 sm:space-y-6">
       <div>
@@ -14,10 +16,7 @@ export default async function InventoryPage() {
           Inventaire des produits
         </h1>
         <p className="text-muted-foreground mt-3">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nisi
-          mollitia blanditiis perspiciatis in voluptates ipsam harum, obcaecati
-          reiciendis aut quasi quas, odio velit itaque cumque dolorem eos.
-          Quibusdam, velit repellat?
+          Consultez et gérez l'ensemble de vos produits. Ajustez vos stocks en quelques clics et gardez une visibilité constante sur votre catalogue.
         </p>
       </div>
       {/* Cartes des produits */}
@@ -37,11 +36,7 @@ export default async function InventoryPage() {
           </p>
         </div>
       ) : (
-            <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((item) => (
-            <InventoryCardProduct key={item.id} products={item} isAdmin={isAdmin} />
-          ))}
-        </div>
+        <InventorySearch products={products} isAdmin={isAdmin} canAddProduct={canAddProduct} />
       )}
     </div>
   );

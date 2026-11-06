@@ -4,7 +4,6 @@ import {
   CircleHelpIcon,
   FileChartColumnIcon,
   FileIcon,
-  FilePlusIcon,
   HistoryIcon,
   LayoutDashboardIcon,
   ListIcon,
@@ -41,9 +40,9 @@ export const menu = {
     },
     {
       title: "Analyse",
-      url: "#",
+      url: "/pages/analytics",
       icon: ChartBarIcon,
-      visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
+      visibleBy: ["admin", "accountant", "manager"] as Role[],
     },
     {
       title: "Historique",
@@ -62,13 +61,13 @@ export const menu = {
   navSecondary: [
     {
       title: "Paramètres",
-      url: "/settings",
+      url: "/pages/settings",
       icon: Settings,
       visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Help",
-      url: "/help",
+      url: "/pages/help",
       icon: CircleHelpIcon,
       visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
@@ -77,32 +76,26 @@ export const menu = {
   documents: [
     {
       title: "Rapports",
-      url: "/repports",
+      url: "/pages/reports",
       icon: FileChartColumnIcon,
       visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Assistance",
-      url: "/assistance",
+      url: "/pages/assistance",
       icon: FileIcon,
       visibleBy: ["admin", "saleperson", "assistant", "accountant", "manager"] as Role[],
     },
     {
       title: "Crédit et dépenses",
-      url: "/assistance",
+      url: "/pages/credit_and_expenses",
       icon: BanknoteArrowDown,
       visibleBy: ["admin", "accountant", "manager"] as Role[],
     },
   ],
 
-  // Menu "Ajout rapide" de la sidebar
+  // Menu "Créer" de la sidebar
   quickAdd: [
-    {
-      title: "Nouvelle clause",
-      url: "/saleperson/dashboard?clause=1",
-      icon: FilePlusIcon,
-      visibleBy: ["saleperson"] as Role[],
-    },
     {
       title: "Nouveau produit",
       url: "/pages/inventory/add",

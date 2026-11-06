@@ -22,6 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import Image from "next/image";
+import noSaleImage from "@/public/clause-a-sale.svg"
 
 type StatusFilter = "all" | "validated" | "cancelled";
 
@@ -84,8 +86,10 @@ export default function HistoricDataTable({ sales }: { sales: SaleHistoricDto[] 
               key={item.value}
               size="sm"
               variant={statusFilter === item.value ? "default" : "outline"}
+              className={statusFilter === item.value ? "bg-primary-gradient text-white" : "bg-transparent"}
               onClick={() => setStatusFilter(item.value)}
             >
+
               {item.label}
               <span className="text-xs opacity-70">
                 {item.value === "all"
@@ -116,8 +120,23 @@ export default function HistoricDataTable({ sales }: { sales: SaleHistoricDto[] 
           <TableBody>
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={historicColumns.length} className="h-24 text-center text-muted-foreground">
-                  Aucune activité à afficher.
+                <TableCell colSpan={historicColumns.length} className="py-14 h-24 text-center">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="flex size-28 items-center justify-center bg-rounded-full bg-muted/60">
+                      <Image src={noSaleImage} alt="Aucune activité à affiché" className="size-24 object-contain"/>
+
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-semibold text-foreground">
+                        Aucune activité à afficher
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Il n'y a aucune activité correspondant à vos critères de recherche.
+                      </p>
+                    </div>
+                  </div>
+                  
+                 
                 </TableCell>
               </TableRow>
             ) : (

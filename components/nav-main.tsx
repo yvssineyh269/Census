@@ -51,27 +51,32 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-8">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  tooltip="Quick Button"
-                  className="min-w-8 bg-primary-gradient text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-                >
-                  <Plus />
-                  <span>Ajout Rapide</span>
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" className="w-56">
-                {quickAdd.map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <Link href={item.url} onClick={closeMobileSidebar}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {quickAdd.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    tooltip="Créer"
+                    className="min-w-8 bg-primary-gradient text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+                  >
+                    <Plus />
+                    <span>Ajouter rapidement</span>
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right" align="start" className="w-56">
+                  {quickAdd.map((item) => (
+                    <DropdownMenuItem key={item.title} asChild>
+                      <Link href={item.url} onClick={closeMobileSidebar}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              // Aucun ajout rapide pour ce rôle : simple ruban aux couleurs de la marque
+              <div aria-hidden className="h-2 flex-1 rounded-full bg-primary-gradient" />
+            )}
             {stockAlerts && <StockAlertViewer alerts={stockAlerts} />}
           </SidebarMenuItem>
         </SidebarMenu>

@@ -10,7 +10,7 @@ import {
 } from "@/query/saleperson.query";
 import { getSalesHistoric } from "@/query/historic.query";
 import { getAllUsers } from "@/query/user.query";
-import { getMarginChartData } from "@/query/margin.query";
+import { getDailyMarginTotals, getMarginChartData, getMonthlyMarginTotals } from "@/query/margin.query";
 import { productShcema } from "@/schemas/zod/product.schema";
 import z from "zod";
 
@@ -58,4 +58,14 @@ export type StockAlertDto = Awaited<
 // TYPE DES DONNEES DU GRAPHIQUE DES MARGES (brute / nette) sur une période
 export type MarginChartDto = Awaited<
   ReturnType<typeof getMarginChartData>
+>;
+
+// TOTAUX D'UNE JOURNEE (et de la veille) pour les cartes d'analyse
+export type DailyMarginDto = Awaited<
+  ReturnType<typeof getDailyMarginTotals>
+>;
+
+// MARGES BRUTE / NETTE PAR MOIS sur une année
+export type MonthlyMarginDto = Awaited<
+  ReturnType<typeof getMonthlyMarginTotals>
 >;

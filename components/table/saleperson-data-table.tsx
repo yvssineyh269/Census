@@ -57,9 +57,12 @@ export default function SalepersonDataTable({
       defaultValue="outline"
       className="w-full flex-col justify-start gap-6"
     >
-      <div className="flex items-center justify-between px-4 lg:px-6">
+      <div className="flex items-center justify-between">
         <div className="flex flex-col gap-4">
-         <h2 className="text-xl font-semibold">Mes ventes</h2>
+          <h3 className="text-2xl sm:text-4xl font-semibold">
+            Mes ventes
+          </h3>
+        
         </div>
 
         {/* Filtres & Bouton de clause */}

@@ -107,7 +107,7 @@ export function SalesDialog({ products, onSaleCreated }: Props) {
                                         {product.quantity} en stock
                                     </Badge>
                                     <Button
-                                        
+                                        variant="outline" className="bg-primary-gradient text-white"
                                         disabled={pendingId === product.id}
                                         onClick={() => handleSale(product.id)}
                                     >

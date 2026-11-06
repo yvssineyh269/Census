@@ -76,14 +76,18 @@ const formatDate = (date: Date) =>
 export default function SalesReviewTable({
   sales,
   role,
+  readOnly = false,
 }: {
   sales: SaleHistoricDto[];
   role: Role;
+  // Masque la colonne des actions (consultation seule)
+  readOnly?: boolean;
 }) {
   const isAdmin = role === "admin";
   const isValidator = role === "manager" || role === "accountant" || role === "assistant";
   // Le télévendeur ne voit que ses propres ventes : la colonne "Vendeur" est inutile
   const isSaleperson = role === "saleperson";
+  const showActions = !isSaleperson && !readOnly;
   const [filter, setFilter] = useState<StatusFilter>(isValidator ? "pending" : "all");
   const { pendingId, handleValidate, handleCancel, handleDelete } = useSaleStatus();
 
@@ -91,7 +95,7 @@ export default function SalesReviewTable({
     filter === "all" ? sales : sales.filter((sale) => sale.status === filter);
 
   return (
-    <div className="flex flex-col gap-4 px-4 lg:px-6">
+    <div className="flex flex-col gap-4 mt-10">
       {/* FILTRES PAR STATUT */}
       <div className="flex flex-wrap items-center gap-2">
         {FILTERS.map((item) => (
@@ -99,7 +103,7 @@ export default function SalesReviewTable({
             key={item.value}
             size="sm"
             variant={filter === item.value ? "default" : "outline"}
-            className={filter === item.value ? "bg-primary-gradient text-white" : undefined}
+            className={filter === item.value ? "bg-primary-gradient text-white" : "bg-transparent"}
             onClick={() => setFilter(item.value)}
           >
             {item.label}
@@ -125,7 +129,7 @@ export default function SalesReviewTable({
               <TableHead>Statut</TableHead>
               <TableHead>Traitée par</TableHead>
               <TableHead>Note</TableHead>
-              {!isSaleperson && <TableHead className="text-center">Actions</TableHead>}
+              {showActions && <TableHead className="text-center">Actions</TableHead>}
             </TableRow>
           </TableHeader>
 
@@ -133,7 +137,7 @@ export default function SalesReviewTable({
           <TableBody>
             {visibleSales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isSaleperson ? 7 : 9} className="py-14 text-center">
+                <TableCell colSpan={(isSaleperson ? 7 : 8) + (showActions ? 1 : 0)} className="py-14 text-center">
                   <div className="flex flex-col items-center justify-center gap-4">
                     <div className="flex size-28 items-center justify-center rounded-full bg-muted/60">
                       <Image
@@ -181,7 +185,7 @@ export default function SalesReviewTable({
                     <TableCell className="max-w-48 truncate" title={sale.note ?? undefined}>
                       {sale.note ?? "—"}
                     </TableCell>
-                    {!isSaleperson && (
+                    {showActions && (
                     <TableCell>
                       <div className="flex justify-center gap-2">
                         {/* MANAGER / COMPTABLE : valider ou annuler une vente en attente */}

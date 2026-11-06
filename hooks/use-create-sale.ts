@@ -13,7 +13,7 @@ export function useCreateSale( products: AvailableProductType[], onSaleCreated?:
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
-    // Ouverture automatique depuis le menu "Ajout rapide" (?clause=1)
+    // Ouverture automatique depuis le menu "Créer" (?clause=1)
     useEffect(() => {
         if (searchParams.get("clause") === "1") {
             setOpen(true);

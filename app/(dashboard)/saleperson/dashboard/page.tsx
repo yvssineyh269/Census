@@ -13,11 +13,14 @@ export default async function SalepersonDasboardPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
+      <div className="@container/main flex flex-1 flex-col gap-2 px-4 lg:px-6">
+      <h1 className="text-3xl sm:text-4xl font-bold">Tableau de bord</h1>
+        <p className="text-muted-foreground mt-3">
+          Visualisez vos performances et vos ventes faites dans la semaine
+        </p>
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <SalepersonCard userId={session.user.id} />
-          <div className="px-4 grid md:grid-cols-2 gap-4 sm:grid-cols-1 lg:px-6">
-          </div>
+          
           <SalepersonDataTable products={products} />
           <SalesReviewTable sales={sales} role="saleperson" />
         </div>

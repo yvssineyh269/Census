@@ -86,7 +86,7 @@ export function StockAlertViewer({ alerts }: { alerts: StockAlertDto[] }) {
 
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button asChild>
+            <Button asChild variant={"outline"} className="w-full bg-primary-gradient text-white">
               <Link href="/pages/inventory">Voir l&apos;inventaire</Link>
             </Button>
           </DrawerClose>
