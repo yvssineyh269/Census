@@ -258,9 +258,7 @@ export default function ExpenseList({
                     <Button
                       type="button"
                       variant="link"
-                      // Soulignement en dégradé : text-decoration ne supporte pas les gradients,
-                      // on dessine donc une ligne de 2px avec le background en bas du bouton
-                      className="h-auto gap-1 rounded-none bg-primary-gradient bg-size-[100%_2px] bg-bottom bg-no-repeat px-0 pb-0.5 text-foreground no-underline hover:no-underline"
+                      className="h-auto gap-1 rounded-none bg-bottom bg-no-repeat px-0 pb-0.5 text-foreground hover:underline"
                       onClick={() => openDetails(expense)}
                     >
                       <span className="hidden @md:inline">Détails</span>
