@@ -22,6 +22,8 @@ model User {
   cancelleedSales Sale[]    @relation("SaleCancelledBy")
   createdSales    Sale[]    @relation("SaleSaleperson")
   validatedSales  Sale[]    @relation("SaleValidatedBy")
+  expenses        Expense[] @relation("ExpenseCreatedBy")
+  cancelledExpenses Expense[] @relation("ExpenseCancelledBy")
   sessions        Session[]
 
   @@map("user")
@@ -128,6 +130,33 @@ model Sale {
   @@map("sales")
 }
 
+model Expense {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  amount      Float
+  image       String
+  status      ExpenseStatus @default(scheduled)
+  spentAt     DateTime
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  // Personne ayant créé la dépense (utilisateur connecté au moment de la saisie)
+  createdById String
+  createdBy   User          @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+  // Annulation (admin uniquement) : la dépense reste visible avec le statut "cancelled"
+  cancelledAt   DateTime?
+  // Motif obligatoire saisi par l'admin lors de l'annulation
+  cancelReason  String?
+  cancelledById String?
+  cancelledBy   User?       @relation("ExpenseCancelledBy", fields: [cancelledById], references: [id])
+
+  @@index([createdById])
+  @@index([cancelledById])
+  @@index([status])
+  @@index([spentAt])
+  @@map("expenses")
+}
+
 enum Role {
   admin
   manager
@@ -139,5 +168,12 @@ enum Role {
 enum SaleState {
   pending
   validated
+  cancelled
+}
+
+enum ExpenseStatus {
+  scheduled
+  in_progress
+  done
   cancelled
 }

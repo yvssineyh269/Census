@@ -8,6 +8,7 @@ import {
   LayoutDashboardIcon,
   ListIcon,
   PackagePlusIcon,
+  ReceiptTextIcon,
   Settings,
   UserPlusIcon,
   UsersIcon,
@@ -88,7 +89,7 @@ export const menu = {
     },
     {
       title: "Crédit et dépenses",
-      url: "/pages/credit_and_expenses",
+      url: "/pages/expenses",
       icon: BanknoteArrowDown,
       visibleBy: ["admin", "accountant", "manager"] as Role[],
     },
@@ -107,6 +108,12 @@ export const menu = {
       url: "/pages/personnals/add",
       icon: UserPlusIcon,
       visibleBy: ["admin"] as Role[],
+    },
+    {
+      title: "Nouvelle dépense",
+      url: "/pages/expenses/add",
+      icon: ReceiptTextIcon,
+      visibleBy: ["admin", "accountant"] as Role[],
     },
   ],
 } satisfies {

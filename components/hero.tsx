@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, StarHalf } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -26,17 +26,17 @@ export default function Hero() {
               <div className="flex gap-x-1">
               </div>
               <p className="mt-3 text-sm text-foreground">
-                <span className="font-bold">4.6</span> /5 - from 12k reviews
+                <span className="font-bold">4.6</span> /5 - trusted by Next Step
               </p>
-              <div className="mt-5">
-                <Star />
+              <div className="mt-5 flex gap-1 text-yellow-400">
+                <Star /> <Star /> <Star /> <Star /> <StarHalf />
               </div>
             </div>
             <div className="py-5">
               <div className="flex gap-x-1">
               </div>
               <p className="mt-3 text-sm text-foreground">
-                <span className="font-bold">4.8</span> /5 - from 5k reviews
+                {/* <span className="font-bold">4.8</span> */}
               </p>
               <div className="mt-5">
               </div>

@@ -11,6 +11,8 @@ import {
 import { getSalesHistoric } from "@/query/historic.query";
 import { getAllUsers } from "@/query/user.query";
 import { getDailyMarginTotals, getMarginChartData, getMonthlyMarginTotals } from "@/query/margin.query";
+import { getAllExpenses } from "@/query/expense.query";
+import { expenseSchema } from "@/schemas/zod/expense.schema";
 import { productShcema } from "@/schemas/zod/product.schema";
 import z from "zod";
 
@@ -69,3 +71,11 @@ export type DailyMarginDto = Awaited<
 export type MonthlyMarginDto = Awaited<
   ReturnType<typeof getMonthlyMarginTotals>
 >;
+
+// TYPE DES DONNEES DU FORMULAIRE D'UNE DEPENSE
+export type ExpenseSchemaDataForm = z.infer<typeof expenseSchema>;
+
+// TYPE D'UNE DEPENSE DANS LA LISTE (avec la personne qui l'a créée)
+export type ExpenseListDto = Awaited<
+  ReturnType<typeof getAllExpenses>
+>[0];

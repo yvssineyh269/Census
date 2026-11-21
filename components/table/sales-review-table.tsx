@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { CheckIcon, Trash2Icon, XIcon } from "lucide-react";
+import {
+  BanIcon,
+  CheckIcon,
+  ClockIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PackageIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
 import type { SaleHistoricDto } from "@/lib/types";
 import { COMOROS_TIME_ZONE } from "@/lib/week-range";
 import type { Role } from "@/lib/roles";
@@ -44,6 +53,8 @@ import noSaleImage from "@/public/clause-a-sale.svg"
 
 type StatusFilter = "pending" | "validated" | "cancelled" | "all";
 
+const PAGE_SIZE = 10;
+
 const STATUS_LABEL = {
   pending: "En attente",
   validated: "Validée",
@@ -54,6 +65,13 @@ const STATUS_CLASS = {
   pending: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   validated: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   cancelled: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+} as const;
+
+// Icône affichée avant le libellé du statut (même principe que les badges des dépenses)
+const STATUS_ICON = {
+  pending: ClockIcon,
+  validated: CheckIcon,
+  cancelled: BanIcon,
 } as const;
 
 const FILTERS: { value: StatusFilter; label: string }[] = [
@@ -91,8 +109,14 @@ export default function SalesReviewTable({
   const [filter, setFilter] = useState<StatusFilter>(isValidator ? "pending" : "all");
   const { pendingId, handleValidate, handleCancel, handleDelete } = useSaleStatus();
 
-  const visibleSales =
+  const [page, setPage] = useState(0);
+
+  const filteredSales =
     filter === "all" ? sales : sales.filter((sale) => sale.status === filter);
+  const pageCount = Math.ceil(filteredSales.length / PAGE_SIZE);
+  // Après une validation / annulation, la liste filtrée peut raccourcir : on reste sur une page existante
+  const currentPage = Math.min(page, Math.max(pageCount - 1, 0));
+  const visibleSales = filteredSales.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
   return (
     <div className="flex flex-col gap-4 mt-10">
@@ -104,7 +128,10 @@ export default function SalesReviewTable({
             size="sm"
             variant={filter === item.value ? "default" : "outline"}
             className={filter === item.value ? "bg-primary-gradient text-white" : "bg-transparent"}
-            onClick={() => setFilter(item.value)}
+            onClick={() => {
+              setFilter(item.value);
+              setPage(0);
+            }}
           >
             {item.label}
             <span className="text-xs opacity-70">
@@ -121,7 +148,9 @@ export default function SalesReviewTable({
           {/* En-têtes du tableau */}
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
+              <TableHead>
+                <span className="sr-only">Image</span>
+              </TableHead>
               <TableHead>Produit</TableHead>
               {!isSaleperson && <TableHead>Vendeur</TableHead>}
               <TableHead>Prix de revente</TableHead>
@@ -129,6 +158,7 @@ export default function SalesReviewTable({
               <TableHead>Statut</TableHead>
               <TableHead>Traitée par</TableHead>
               <TableHead>Note</TableHead>
+              <TableHead>Date</TableHead>
               {showActions && <TableHead className="text-center">Actions</TableHead>}
             </TableRow>
           </TableHeader>
@@ -137,7 +167,7 @@ export default function SalesReviewTable({
           <TableBody>
             {visibleSales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={(isSaleperson ? 7 : 8) + (showActions ? 1 : 0)} className="py-14 text-center">
+                <TableCell colSpan={(isSaleperson ? 8 : 9) + (showActions ? 1 : 0)} className="py-14 text-center">
                   <div className="flex flex-col items-center justify-center gap-4">
                     <div className="flex size-28 items-center justify-center rounded-full bg-muted/60">
                       <Image
@@ -167,7 +197,9 @@ export default function SalesReviewTable({
 
                 return (
                   <TableRow key={sale.id}>
-                    <TableCell className="whitespace-nowrap">{formatDate(sale.createdAt)}</TableCell>
+                    <TableCell className="w-0">
+                      <ProductThumbnail image={sale.product.image} name={sale.product.productName} />
+                    </TableCell>
                     <TableCell className="font-medium">{sale.product.productName}</TableCell>
                     {!isSaleperson && <TableCell>{sale.saleperson.name}</TableCell>}
                     <TableCell className="whitespace-nowrap">
@@ -179,12 +211,13 @@ export default function SalesReviewTable({
                       <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
                     </TableCell>
                     <TableCell>
-                      <Badge className={STATUS_CLASS[sale.status]}>{STATUS_LABEL[sale.status]}</Badge>
+                      <StatusBadge status={sale.status} />
                     </TableCell>
                     <TableCell>{handledBy ?? "—"}</TableCell>
                     <TableCell className="max-w-48 truncate" title={sale.note ?? undefined}>
                       {sale.note ?? "—"}
                     </TableCell>
+                    <TableCell className="whitespace-nowrap">{formatDate(sale.createdAt)}</TableCell>
                     {showActions && (
                     <TableCell>
                       <div className="flex justify-center gap-2">
@@ -227,6 +260,69 @@ export default function SalesReviewTable({
           </TableBody>
         </Table>
       </CardContent>
+
+      {/* PAGINATION */}
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <span>
+          {filteredSales.length} vente{filteredSales.length > 1 ? "s" : ""}
+        </span>
+        <div className="flex items-center gap-2">
+          <span>
+            Page {pageCount === 0 ? 0 : currentPage + 1} sur {pageCount}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8"
+            disabled={currentPage === 0}
+            onClick={() => setPage(currentPage - 1)}
+          >
+            <ChevronLeftIcon />
+            <span className="sr-only">Page précédente</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8"
+            disabled={currentPage >= pageCount - 1}
+            onClick={() => setPage(currentPage + 1)}
+          >
+            <ChevronRightIcon />
+            <span className="sr-only">Page suivante</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Badge de statut avec son icône
+function StatusBadge({ status }: { status: keyof typeof STATUS_LABEL }) {
+  const Icon = STATUS_ICON[status];
+  return (
+    <Badge className={STATUS_CLASS[status]}>
+      <Icon aria-hidden="true" />
+      {STATUS_LABEL[status]}
+    </Badge>
+  );
+}
+
+// Miniature de l'image du produit (icône de repli si l'image est absente)
+function ProductThumbnail({ image, name }: { image: string | null; name: string }) {
+  return (
+    <div className="relative size-10 shrink-0 overflow-hidden rounded-md border bg-muted">
+      {image ? (
+        <Image
+          src={`/api/s3/image?key=${encodeURIComponent(image)}`}
+          alt={name}
+          fill
+          sizes="40px"
+          unoptimized
+          className="object-cover"
+        />
+      ) : (
+        <PackageIcon className="absolute inset-0 m-auto size-4 text-muted-foreground" />
+      )}
     </div>
   );
 }

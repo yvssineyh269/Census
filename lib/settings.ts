@@ -19,6 +19,9 @@ export const routeAccessMap : RouteAccessMap = {
     "/pages/personnals(/.*)?": ["admin", "manager", "accountant"],
     "/pages/personnals/add(/.*)?": ["admin"],
     "/pages/personnals/[^/]+/edit": ["admin"],
+    "/pages/expenses(/.*)?": ["admin", "accountant", "manager"],
+    // Le manager consulte les dépenses en lecture seule : pas de création
+    "/pages/expenses/add(/.*)?": ["admin", "accountant"],
     // Toute autre page sous /pages exige au minimum d'être connecté
     "/pages(/.*)?": ["admin", "saleperson", "manager", "accountant", "assistant"],
 };

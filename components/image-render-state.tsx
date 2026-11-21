@@ -6,8 +6,10 @@ import Image from "next/image";
 // 1.
 export function ImageRenderEmptyState({
   isDragActive,
+  subject = "du produit",
 }: {
   isDragActive: boolean;
+  subject?: string;
 }) {
   return (
     <div className="text-center">
@@ -18,9 +20,9 @@ export function ImageRenderEmptyState({
       </div>
 
       <p className="text-base font-semibold text-foreground">
-        Déposez l'image du produit ici ou bien{" "}
+        Déposez l'image {subject} ici ou bien{" "}
         <span className="bg-clip-text text-transparent bg-primary-gradient cursor-pointer">
-          Cliquez pour importer l'image du produit
+          Cliquez pour importer l'image {subject}
         </span>
       </p>
 

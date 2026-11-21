@@ -12,6 +12,7 @@ import {
   ImageRenderUploadingState,
 } from "./image-render-state";
 import { toast } from "sonner";
+import type { ImageFolder } from "@/schemas/zod/image.upload.schema";
 
 interface ImageUploaderState {
   id: string | null;
@@ -28,12 +29,16 @@ interface ImageUploaderState {
 interface ImageUplaodProps {
   data?: string;
   onChange?: (data: string) => void;
+  // Dossier S3 de destination ("products" par défaut)
+  folder?: ImageFolder;
+  // Ce que représente l'image, affiché dans la zone de dépôt (ex. "du produit", "de la dépense")
+  subject?: string;
 }
 
 // Seules les URL locales (blob:) créées pour l'aperçu doivent être libérées
 const isBlobUrl = (url?: string): url is string => !!url && url.startsWith("blob:");
 
-export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
+export default function ImageUploader({ data, onChange, folder = "products", subject }: ImageUplaodProps) {
   // En modification, l'image actuelle du produit est affichée directement dans le champ
   const [fileState, setFileState] = useState<ImageUploaderState>({
     progress: 0,
@@ -64,6 +69,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
           contentType: file.type,
           size: file.size,
           isImage: true,
+          folder,
         }),
       });
 
@@ -270,7 +276,7 @@ export default function ImageUploader({ data, onChange }: ImageUplaodProps) {
       );
     }
 
-    return <ImageRenderEmptyState isDragActive={isDragActive} />;
+    return <ImageRenderEmptyState isDragActive={isDragActive} subject={subject} />;
   }
 
   useEffect(() => {
