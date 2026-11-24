@@ -7,6 +7,16 @@ const historicOfSale = {
     soldAt: true,
     cancelledAt: true,
     note: true,
+    // Ajustement du dernier prix par l'admin
+    originalSellingPrice: true,
+    originalCommission: true,
+    adjustedAt: true,
+    adjustedBy: {
+        select: {
+            id: true,
+            name: true,
+        }
+    },
     saleperson: {
         select: {
             id: true,

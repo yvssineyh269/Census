@@ -22,6 +22,7 @@ model User {
   cancelleedSales Sale[]    @relation("SaleCancelledBy")
   createdSales    Sale[]    @relation("SaleSaleperson")
   validatedSales  Sale[]    @relation("SaleValidatedBy")
+  adjustedSales   Sale[]    @relation("SaleAdjustedBy")
   expenses        Expense[] @relation("ExpenseCreatedBy")
   cancelledExpenses Expense[] @relation("ExpenseCancelledBy")
   sessions        Session[]
@@ -116,6 +117,13 @@ model Sale {
   // Commission due à l'assistant(e) s'il/elle a validé la vente (0 sinon), figée à la validation
   assistantCommission Float @default(0)
   cancelledById String?
+  // Ajustement du "dernier prix" par l'admin : prix et commission d'origine (prix fixé du produit)
+  // conservés lors du premier ajustement, null si la vente n'a jamais été ajustée
+  originalSellingPrice Float?
+  originalCommission   Float?
+  adjustedAt           DateTime?
+  adjustedById         String?
+  adjustedBy           User?   @relation("SaleAdjustedBy", fields: [adjustedById], references: [id])
   productId     String
   cancelledBy   User?     @relation("SaleCancelledBy", fields: [cancelledById], references: [id])
   product       Product   @relation(fields: [productId], references: [id])
@@ -125,6 +133,7 @@ model Sale {
   @@index([salepersonId])
   @@index([validatorId])
   @@index([cancelledById])
+  @@index([adjustedById])
   @@index([productId])
   @@index([status])
   @@map("sales")

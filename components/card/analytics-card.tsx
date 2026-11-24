@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { Loader } from "lucide-react";
 import { fr } from "react-day-picker/locale";
 import { toast } from "sonner";
@@ -31,6 +31,33 @@ const plural = (count: number, word: string) => `${count} ${word}${count > 1 ? "
 export default function AnalyticsCards({ initialDaily, children }: { initialDaily: DailyMarginDto; children?: ReactNode }) {
     const [daily, setDaily] = useState(initialDaily);
     const [isPending, startTransition] = useTransition();
+
+    // Après un router.refresh() (ex. ajustement du dernier prix d'une vente), le serveur renvoie de
+    // nouveaux totaux pour aujourd'hui : on les reprend si c'est le jour affiché…
+    const [prevInitial, setPrevInitial] = useState(initialDaily);
+    if (prevInitial !== initialDaily) {
+        setPrevInitial(initialDaily);
+        if (initialDaily.day === daily.day) setDaily(initialDaily);
+    }
+
+    // … sinon on recharge le jour sélectionné dans le calendrier
+    const selectedDayRef = useRef(daily.day);
+    selectedDayRef.current = daily.day;
+    const isFirstRender = useRef(true);
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        const day = selectedDayRef.current;
+        if (day === initialDaily.day) return;
+        startTransition(async () => {
+            const { data, error } = await tryCatch(fetchDailyMargin(day));
+            if (!error && data.status === "success" && data.daily.day === selectedDayRef.current) {
+                setDaily(data.daily);
+            }
+        });
+    }, [initialDaily]);
 
     const selected = fromDayKey(daily.day);
     const isToday = daily.day === toDayKey(new Date());

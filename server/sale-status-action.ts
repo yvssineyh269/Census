@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { getSessionWithRole } from "@/lib/authorization";
-import { cancelSaleSchema } from "@/schemas/zod/sale.schema";
+import { adjustSaleSchema, cancelSaleSchema } from "@/schemas/zod/sale.schema";
 import { ASSISTANT_COMMISSION_PER_SALE } from "@/query/assistant.query";
 
 // Erreur métier dont le message peut être affiché tel quel à l'utilisateur
@@ -166,4 +166,74 @@ export async function deleteSale(saleId: string) {
   }
 
   return { status: "success", message: "Vente supprimée" };
+}
+
+// AJUSTER LE DERNIER PRIX D'UNE VENTE (admin uniquement)
+// Le télévendeur clôture au prix fixé du produit ; si la vente a réellement été conclue plus bas,
+// l'admin corrige le prix de revente et la commission. Le CA, les marges et les commissions étant
+// calculés à partir de la vente, ils sont réajustés automatiquement.
+// Le prix et la commission d'origine sont conservés lors du premier ajustement.
+export async function adjustSalePrice(saleId: string, values: { sellingPrice: number; commission: number }) {
+  const session = await getSessionWithRole(["admin"]);
+
+  if (!session) {
+    return { status: "error", message: "Seul un administrateur peut ajuster le prix d'une vente" };
+  }
+
+  const validation = adjustSaleSchema.safeParse(values);
+
+  if (!validation.success) {
+    return { status: "error", message: validation.error.issues[0].message };
+  }
+
+  const { sellingPrice, commission } = validation.data;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const sale = await tx.sale.findUnique({
+        where: { id: saleId },
+        select: {
+          status: true,
+          sellingPrice: true,
+          commission: true,
+          originalSellingPrice: true,
+          originalCommission: true,
+        },
+      });
+
+      if (!sale || sale.status === "cancelled") {
+        throw new SaleActionError("Seule une vente en attente ou validée peut être ajustée");
+      }
+
+      if (sale.sellingPrice === sellingPrice && sale.commission === commission) {
+        throw new SaleActionError("Aucune modification : le prix et la commission sont identiques");
+      }
+
+      const updated = await tx.sale.updateMany({
+        // Le filtre sur les valeurs lues empêche d'écraser un ajustement simultané
+        where: {
+          id: saleId,
+          status: { not: "cancelled" },
+          sellingPrice: sale.sellingPrice,
+          commission: sale.commission,
+        },
+        data: {
+          sellingPrice,
+          commission,
+          originalSellingPrice: sale.originalSellingPrice ?? sale.sellingPrice,
+          originalCommission: sale.originalCommission ?? sale.commission,
+          adjustedAt: new Date(),
+          adjustedById: session.user.id,
+        },
+      });
+
+      if (updated.count === 0) {
+        throw new SaleActionError("La vente a été modifiée entre-temps, réessayez");
+      }
+    });
+  } catch (error) {
+    return toResult(error);
+  }
+
+  return { status: "success", message: "Prix ajusté, le chiffre d'affaires et les marges ont été recalculés" };
 }

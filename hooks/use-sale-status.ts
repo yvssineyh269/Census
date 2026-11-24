@@ -1,5 +1,5 @@
 import { tryCatch } from "@/lib/try-catch";
-import { cancelSale, deleteSale, validateSale } from "@/server/sale-status-action";
+import { adjustSalePrice, cancelSale, deleteSale, validateSale } from "@/server/sale-status-action";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,6 +29,8 @@ export function useSaleStatus() {
     const handleValidate = (saleId: string) => run(saleId, () => validateSale(saleId));
     const handleCancel = (saleId: string, note: string) => run(saleId, () => cancelSale(saleId, note));
     const handleDelete = (saleId: string) => run(saleId, () => deleteSale(saleId));
+    const handleAdjust = (saleId: string, values: { sellingPrice: number; commission: number }) =>
+        run(saleId, () => adjustSalePrice(saleId, values));
 
-    return { pendingId, handleValidate, handleCancel, handleDelete };
+    return { pendingId, handleValidate, handleCancel, handleDelete, handleAdjust };
 }

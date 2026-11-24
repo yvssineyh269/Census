@@ -8,6 +8,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   PackageIcon,
+  PencilIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -20,6 +21,8 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import {
   Table,
   TableBody,
@@ -106,8 +109,12 @@ export default function SalesReviewTable({
   // Le télévendeur ne voit que ses propres ventes : la colonne "Vendeur" est inutile
   const isSaleperson = role === "saleperson";
   const showActions = !isSaleperson && !readOnly;
+  // Montant d'origine barré (vente ajustée) : prix visible par l'admin, le manager et le télévendeur ;
+  // le télévendeur ne voit pas l'ancienne commission, seulement la commission ajustée
+  const showOriginal = isAdmin || role === "manager" || isSaleperson;
+  const showOriginalCommission = isAdmin || role === "manager";
   const [filter, setFilter] = useState<StatusFilter>(isValidator ? "pending" : "all");
-  const { pendingId, handleValidate, handleCancel, handleDelete } = useSaleStatus();
+  const { pendingId, handleValidate, handleCancel, handleDelete, handleAdjust } = useSaleStatus();
 
   const [page, setPage] = useState(0);
 
@@ -203,12 +210,10 @@ export default function SalesReviewTable({
                     <TableCell className="font-medium">{sale.product.productName}</TableCell>
                     {!isSaleperson && <TableCell>{sale.saleperson.name}</TableCell>}
                     <TableCell className="whitespace-nowrap">
-                      {sale.sellingPrice.toLocaleString("fr-FR")}{" "}
-                      <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
+                      <Amount value={sale.sellingPrice} original={showOriginal ? sale.originalSellingPrice : null} />
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
-                      {sale.commission.toLocaleString("fr-FR")}{" "}
-                      <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
+                      <Amount value={sale.commission} original={showOriginalCommission ? sale.originalCommission : null} />
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={sale.status} />
@@ -233,6 +238,15 @@ export default function SalesReviewTable({
                               onConfirm={(note) => handleCancel(sale.id, note)}
                             />
                           </>
+                        )}
+
+                        {/* ADMIN : ajuster le dernier prix (prix réellement encaissé) et la commission */}
+                        {isAdmin && sale.status !== "cancelled" && (
+                          <AdjustSaleDialog
+                            disabled={isBusy}
+                            sale={sale}
+                            onConfirm={(values) => handleAdjust(sale.id, values)}
+                          />
                         )}
 
                         {/* ADMIN : corriger une vente validée à tort et supprimer */}
@@ -292,6 +306,24 @@ export default function SalesReviewTable({
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Montant en KMF ; si la vente a été ajustée, le montant d'origine est affiché barré en dessous
+function Amount({ value, original }: { value: number; original?: number | null }) {
+  const isAdjusted = original != null && original !== value;
+  return (
+    <div className="flex flex-col">
+      <span>
+        {value.toLocaleString("fr-FR")}{" "}
+        <span className="bg-clip-text text-transparent bg-primary-gradient text-[0.6rem] align-bottom">KMF</span>
+      </span>
+      {isAdjusted && (
+        <span className="text-xs text-muted-foreground line-through" title="Montant d'origine (prix fixé)">
+          {original.toLocaleString("fr-FR")} KMF
+        </span>
+      )}
     </div>
   );
 }
@@ -392,6 +424,151 @@ function CancelSaleDialog({
             </Button>
             <Button type="submit" variant="destructive" disabled={!isNoteValid || submitting}>
               {submitting ? "Annulation..." : "Confirmer l'annulation"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Ajustement du dernier prix (admin) : prix réellement encaissé et commission du télévendeur
+function AdjustSaleDialog({
+  sale,
+  disabled,
+  onConfirm,
+}: {
+  sale: SaleHistoricDto;
+  disabled: boolean;
+  onConfirm: (values: { sellingPrice: number; commission: number }) => Promise<boolean>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [price, setPrice] = useState(String(sale.sellingPrice));
+  const [commission, setCommission] = useState(String(sale.commission));
+  const [submitting, setSubmitting] = useState(false);
+
+  const fixedPrice = sale.originalSellingPrice ?? sale.sellingPrice;
+  const fixedCommission = sale.originalCommission ?? sale.commission;
+  const priceValue = Number(price);
+  const commissionValue = Number(commission);
+
+  const priceError =
+    price.trim() === "" || !Number.isFinite(priceValue) || priceValue <= 0
+      ? "Le prix doit être supérieur à 0"
+      : null;
+  const commissionError =
+    commission.trim() === "" || !Number.isFinite(commissionValue) || commissionValue < 0
+      ? "La commission ne peut pas être négative"
+      : !priceError && commissionValue > priceValue
+        ? "La commission ne peut pas dépasser le prix"
+        : null;
+  const isUnchanged = priceValue === sale.sellingPrice && commissionValue === sale.commission;
+  const canSubmit = !priceError && !commissionError && !isUnchanged && !submitting;
+
+  // Écart du prix par rapport au prix fixé, multiplié par la quantité (impact sur le CA)
+  const revenueDelta = priceError ? 0 : (priceValue - fixedPrice) * sale.quantity;
+
+  // Le formulaire repart des valeurs actuelles de la vente à chaque ouverture
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      setPrice(String(sale.sellingPrice));
+      setCommission(String(sale.commission));
+    }
+    setOpen(next);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setSubmitting(true);
+    const success = await onConfirm({ sellingPrice: priceValue, commission: commissionValue });
+    setSubmitting(false);
+    if (success) setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline" disabled={disabled} className="bg-primary/10" title="Ajuster le dernier prix">
+          <PencilIcon className="text-primary" />
+          <span className="sr-only">Ajuster le dernier prix</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>Ajuster le dernier prix</DialogTitle>
+            <DialogDescription>
+              {sale.product.productName} — vendu par {sale.saleperson.name}
+              {sale.quantity > 1 ? ` (×${sale.quantity})` : ""}. Saisissez le prix réellement encaissé et la
+              commission due : le chiffre d&apos;affaires et les marges seront recalculés.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="rounded-md border bg-muted/40 p-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Prix fixé</span>
+              <span>{fixedPrice.toLocaleString("fr-FR")} KMF</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Commission d&apos;origine</span>
+              <span>{fixedCommission.toLocaleString("fr-FR")} KMF</span>
+            </div>
+            {sale.adjustedAt && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Déjà ajustée le {formatDate(sale.adjustedAt)}
+                {sale.adjustedBy ? ` par ${sale.adjustedBy.name}` : ""}.
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor={`adjust-price-${sale.id}`}>Dernier prix (KMF)</FieldLabel>
+              <Input
+                id={`adjust-price-${sale.id}`}
+                type="number"
+                inputMode="numeric"
+                min={0}
+                step="any"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              {priceError && <FieldDescription className="text-destructive">{priceError}</FieldDescription>}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`adjust-commission-${sale.id}`}>Commission (KMF)</FieldLabel>
+              <Input
+                id={`adjust-commission-${sale.id}`}
+                type="number"
+                inputMode="numeric"
+                min={0}
+                step="any"
+                value={commission}
+                onChange={(e) => setCommission(e.target.value)}
+              />
+              {commissionError && (
+                <FieldDescription className="text-destructive">{commissionError}</FieldDescription>
+              )}
+            </Field>
+          </div>
+
+          {revenueDelta !== 0 && (
+            <p className="text-sm text-muted-foreground">
+              Écart sur le chiffre d&apos;affaires par rapport au prix fixé :{" "}
+              <span className={revenueDelta < 0 ? "text-destructive" : "text-green-600"}>
+                {revenueDelta > 0 ? "+" : ""}
+                {revenueDelta.toLocaleString("fr-FR")} KMF
+              </span>
+            </p>
+          )}
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Retour
+            </Button>
+            <Button type="submit" disabled={!canSubmit} className="bg-primary-gradient text-white">
+              {submitting ? "Enregistrement..." : "Enregistrer"}
             </Button>
           </DialogFooter>
         </form>
