@@ -491,7 +491,7 @@ function AdjustSaleDialog({
       <DialogTrigger asChild>
         <Button variant="outline" disabled={disabled} className="bg-primary/10" title="Ajuster le dernier prix">
           <PencilIcon className="text-primary" />
-          <span className="sr-only">Ajuster le dernier prix</span>
+          <span className="sr-only">Ajuster le prix réellement encaissé</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -499,7 +499,10 @@ function AdjustSaleDialog({
           <DialogHeader>
             <DialogTitle>Ajuster le dernier prix</DialogTitle>
             <DialogDescription>
-              {sale.product.productName} — vendu par {sale.saleperson.name}
+              <span className="font-semibold">
+                {sale.product.productName}
+              </span>
+               - vendu par <span className="font-semibold">{sale.saleperson.name}</span> 
               {sale.quantity > 1 ? ` (×${sale.quantity})` : ""}. Saisissez le prix réellement encaissé et la
               commission due : le chiffre d&apos;affaires et les marges seront recalculés.
             </DialogDescription>
