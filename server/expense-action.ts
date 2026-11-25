@@ -4,14 +4,14 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
 import { S3 } from "@/lib/S3Client";
-import { EXPENSE_ROLES, getSessionWithRole } from "@/lib/authorization";
+import { EXPENSE_CREATE_ROLES, EXPENSE_ROLES, getSessionWithRole } from "@/lib/authorization";
 import { EXPENSE_STATUS_LABELS } from "@/lib/expense-status";
 import { cancelExpenseSchema, EXPENSE_STATUSES, expenseSchema } from "@/schemas/zod/expense.schema";
 import { EXPENSE_IMAGE_PREFIX } from "@/schemas/zod/image.upload.schema";
 import type { ExpenseSchemaDataForm } from "@/lib/types";
 
 export async function addExpense(data: ExpenseSchemaDataForm) {
-  const session = await getSessionWithRole(EXPENSE_ROLES);
+  const session = await getSessionWithRole(EXPENSE_CREATE_ROLES);
 
   if (!session) {
     return {
@@ -64,7 +64,7 @@ export async function addExpense(data: ExpenseSchemaDataForm) {
   }
 }
 
-// CHANGER LE STATUT D'UNE DEPENSE (admin, comptable — le manager est en lecture seule)
+// CHANGER LE STATUT D'UNE DEPENSE (admin, comptable — le manager peut seulement créer)
 // Programmée / En cours / Effectuée uniquement : une dépense annulée ne change plus de statut.
 export async function updateExpenseStatus(expenseId: string, status: string) {
   const session = await getSessionWithRole(EXPENSE_ROLES);

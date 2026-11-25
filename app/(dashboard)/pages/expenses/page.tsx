@@ -11,9 +11,10 @@ import noProductInInventory from "@/public/no-product-in-inventory.svg";
 export default async function ExpensesPage() {
   // L'accès à la page est limité à admin / manager / comptable (lib/settings.ts)
   const [session, expenses] = await Promise.all([getCurrentSession(), getAllExpenses()]);
-  // Admin et comptable gèrent les dépenses (création, statut, annulation), seul l'admin supprime.
-  // Le manager est en lecture seule.
+  // Admin, comptable et manager enregistrent des dépenses.
+  // Admin et comptable changent le statut et annulent, seul l'admin supprime.
   const role = session.user.role;
+  const canCreate = role === "admin" || role === "accountant" || role === "manager";
   const canManage = role === "admin" || role === "accountant";
   const canDelete = role === "admin";
 
@@ -26,7 +27,7 @@ export default async function ExpensesPage() {
             Consultez et gérez l'ensemble de vos crédits et dépenses. Ajustez vos transactions en quelques clics et gardez une visibilité constante sur votre situation financière.
           </p>
         </div>
-        {canManage && (
+        {canCreate && (
           <Link
             href="/pages/expenses/add"
             className={cn(buttonVariants(), "shrink-0 bg-primary-gradient text-white hover:bg-primary-gradient-hover")}

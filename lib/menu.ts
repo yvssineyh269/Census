@@ -113,7 +113,7 @@ export const menu = {
       title: "Nouvelle dépense",
       url: "/pages/expenses/add",
       icon: ReceiptTextIcon,
-      visibleBy: ["admin", "accountant"] as Role[],
+      visibleBy: ["admin", "accountant", "manager"] as Role[],
     },
   ],
 } satisfies {

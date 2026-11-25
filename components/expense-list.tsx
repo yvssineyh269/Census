@@ -123,7 +123,7 @@ export default function ExpenseList({
   canDelete,
 }: {
   expenses: ExpenseListDto[];
-  // Admin et comptable : changer le statut et annuler. Manager : lecture seule.
+  // Admin et comptable : changer le statut et annuler. Manager : création uniquement (pas de statut ni d'annulation).
   canManage: boolean;
   // Admin uniquement : suppression définitive
   canDelete: boolean;
